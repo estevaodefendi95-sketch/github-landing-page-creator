@@ -550,7 +550,7 @@ function LandingPage() {
                 <div className="diag-feature"><div className="diag-feature-icon">✓</div>Recomendações personalizadas para o seu negócio</div>
                 <div className="diag-feature"><div className="diag-feature-icon">✓</div>100% gratuito e confidencial</div>
               </div>
-              <a href="https://nortyx-diagnostico.lovable.app" target="_blank" rel="noreferrer" className="diag-cta">
+              <a href="https://nortyxdiagnostico.lovable.app" target="_blank" rel="noreferrer" className="diag-cta">
                 Fazer diagnóstico gratuito →
               </a>
               <div className="diag-note">Leva menos de 5 minutos · Resultado imediato</div>
