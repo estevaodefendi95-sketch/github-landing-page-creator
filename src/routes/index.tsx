@@ -108,9 +108,19 @@ function LandingPage() {
   } as const;
 
   return (
-    <>
+    <div
+      contentEditable={editMode}
+      suppressContentEditableWarning
+      style={editMode ? { outline: "2px dashed #1a2454", outlineOffset: -4 } : undefined}
+    >
+      {editMode && (
+        <div style={{ position: "fixed", top: 12, right: 12, zIndex: 9999, background: "#1a2454", color: "#fff", padding: "8px 14px", borderRadius: 999, fontSize: 13, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(0,0,0,.2)" }}>
+          ✏️ Modo edição ativo — Ctrl+Shift+E para sair
+        </div>
+      )}
       {/* NAV */}
       <nav id="nav" style={{ boxShadow: navShadow ? "0 4px 20px rgba(10,10,10,.07)" : "none" }}>
+
         <div className="nav-brand">
           <a href="#" className="logo" aria-label="Nortyx">
             <img src={nortyxLogo.url} alt="Nortyx" style={{ height: 80, width: "auto", display: "block", objectFit: "contain" }} />
