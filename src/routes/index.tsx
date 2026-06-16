@@ -68,6 +68,10 @@ function LandingPage() {
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeModal();
+      if (e.ctrlKey && e.shiftKey && (e.key === "E" || e.key === "e")) {
+        e.preventDefault();
+        setEditMode((v) => !v);
+      }
     };
     window.addEventListener("keydown", onKey);
 
