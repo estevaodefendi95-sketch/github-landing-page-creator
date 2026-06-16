@@ -45,6 +45,7 @@ function LandingPage() {
   const [navShadow, setNavShadow] = useState(false);
   const [modal, setModal] = useState<ModalState>({ open: false, planName: "Profissional", planPrice: "R$ 1.290/mês" });
   const [submitted, setSubmitted] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   // Scroll-reveal + nav shadow
   useEffect(() => {
