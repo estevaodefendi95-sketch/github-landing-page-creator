@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
+import nortyxLogo from "@/assets/nortyx-logo.png.asset.json";
 
 const WHATSAPP_BASE = "https://wa.me/5516991776593";
 const WHATSAPP_HERO = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero uma consultoria financeira!")}`;
