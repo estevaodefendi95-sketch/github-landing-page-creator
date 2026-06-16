@@ -106,8 +106,8 @@ function LandingPage() {
       {/* NAV */}
       <nav id="nav" style={{ boxShadow: navShadow ? "0 4px 20px rgba(10,10,10,.07)" : "none" }}>
         <div className="nav-brand">
-          <a href="#" className="logo">
-            nortyx<span>.</span>
+          <a href="#" className="logo" aria-label="Nortyx">
+            <img src={nortyxLogo.url} alt="Nortyx" style={{ height: 32, width: "auto", display: "block" }} />
           </a>
           <ul className="nav-links">
             <li><a href="#servicos">Serviços</a></li>
