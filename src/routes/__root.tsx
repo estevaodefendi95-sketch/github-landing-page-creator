@@ -83,6 +83,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Nortyx" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Nortyx — Consultoria Financeira" },
+      { name: "twitter:title", content: "Nortyx — Consultoria Financeira" },
+      { property: "og:description", content: "Consultoria financeira para profissionais autônomos e pequenas empresas." },
+      { name: "twitter:description", content: "Consultoria financeira para profissionais autônomos e pequenas empresas." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3e7a7065-43d4-4796-b2ab-c90230df5940/id-preview-8086712a--05a11de2-e991-44d2-97e2-454267c97638.lovable.app-1781633546579.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3e7a7065-43d4-4796-b2ab-c90230df5940/id-preview-8086712a--05a11de2-e991-44d2-97e2-454267c97638.lovable.app-1781633546579.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
