@@ -224,8 +224,9 @@ section{padding:100px 60px}
 .tgl input:checked~.tgl-thumb{left:26px}
 .annual-badge{background:rgba(22,163,74,.1);color:var(--green);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
 
-.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--lp-border);border:1px solid var(--lp-border);border-radius:16px;overflow:hidden}
-.plan{background:var(--white);padding:36px 32px;position:relative;transition:background .2s}
+.plans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--lp-border);border:1px solid var(--lp-border);border-radius:16px;overflow:hidden}
+@media(max-width:1200px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
+.plan{background:var(--white);padding:34px 26px;position:relative;transition:background .2s}
 .plan:hover{background:var(--cream)}
 .plan.hot{background:var(--navy)}
 .plan.hot:hover{background:#243068}
@@ -456,4 +457,83 @@ footer{background:#060912;padding:52px 60px 32px}
 @keyframes fadeToast {
   from { opacity:0; transform:translateX(-50%) translateY(-8px); }
   to   { opacity:1; transform:translateX(-50%) translateY(0); }
+}
+
+/* ── HERO CARROSSEL ── */
+.hero-carousel{position:relative;overflow:hidden}
+.hc-track{display:grid}
+.hc-slide{grid-area:1/1;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .7s ease,visibility .7s;transform:translateY(0)}
+.hc-slide.hc-active{opacity:1;visibility:visible;pointer-events:auto;z-index:1}
+
+.hc-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.9);border:1px solid var(--lp-border);
+  color:var(--navy);font-size:1.5rem;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;box-shadow:0 4px 16px rgba(26,36,84,.08);
+  font-family:inherit;padding:0 0 3px;
+}
+.hc-arrow:hover{background:var(--navy);color:var(--white);border-color:var(--navy)}
+.hc-prev{left:18px}
+.hc-next{right:18px}
+
+.hc-dots{
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:5;
+  display:flex;gap:8px;align-items:center;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(8px);
+  border:1px solid var(--lp-border);border-radius:100px;padding:6px 8px;
+  box-shadow:0 4px 16px rgba(26,36,84,.07);
+}
+.hc-dot{
+  border:none;background:transparent;cursor:pointer;
+  font-family:inherit;font-size:.7rem;font-weight:600;color:var(--lp-muted);
+  padding:6px 14px;border-radius:100px;transition:all .25s;letter-spacing:.03em;
+}
+.hc-dot:hover{color:var(--navy);background:var(--accentL)}
+.hc-dot.on{background:var(--navy);color:var(--white)}
+
+/* ── BANNER 2 · mini-diagnóstico interativo ── */
+.hero-diag{background:linear-gradient(135deg,var(--cream) 0%,#eef0f9 100%)}
+.diag-mini{width:400px}
+.dm-q{font-size:.95rem;color:var(--ink);line-height:1.6;margin-bottom:20px;font-weight:400}
+.dm-score-row{display:flex;align-items:center;gap:18px;margin-bottom:18px}
+.dm-score{
+  font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:400;
+  color:var(--navy);line-height:1;min-width:52px;text-align:center;
+  background:var(--pale);border-radius:12px;padding:10px 6px;
+}
+.dm-range{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:100px;background:var(--lp-border);outline:none;cursor:pointer}
+.dm-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 2px 8px rgba(26,36,84,.3);cursor:grab}
+.dm-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 2px 8px rgba(26,36,84,.3);cursor:grab}
+.dm-msg{
+  font-size:.82rem;color:var(--gray);line-height:1.6;font-weight:300;
+  background:var(--pale);border-radius:10px;padding:14px 16px;margin-bottom:20px;
+  display:flex;gap:8px;align-items:flex-start;min-height:66px;
+}
+
+/* ── BANNER 3 · App Nortyx ── */
+.hero-app{background:linear-gradient(160deg,var(--cream) 0%,#f0ede6 100%)}
+.hero-app .btn-primary{border:none;cursor:pointer;font-family:inherit}
+
+/* ── PLANO APP NORTYX ── */
+.app-plan{background:var(--navy2)}
+.app-plan:hover{background:#161d45}
+.app-plan .plan-name{color:var(--white)}
+.app-plan .plan-tagline{color:rgba(255,255,255,.4)}
+.app-plan .plan-price{color:var(--white)}
+.app-plan .plan-period{color:rgba(255,255,255,.35)}
+.app-plan .plan-sep{background:rgba(255,255,255,.08)}
+.app-plan .plan-feat{color:rgba(255,255,255,.6)}
+.app-plan-badge{background:rgba(255,255,255,.14);color:rgba(255,255,255,.8)}
+.app-plan-btn{background:var(--white);color:var(--navy);border:none;cursor:pointer;width:100%;font-family:inherit}
+.app-plan-btn:hover{background:var(--cream)}
+
+@media(max-width:1060px){
+  .plans-grid{grid-template-columns:1fr}
+  .hc-arrow{display:none}
+  .hc-dots{bottom:14px}
+  .hc-dot{padding:6px 10px;font-size:.65rem}
+  .diag-mini{width:100%}
+  .hero-diag .hero-right,.hero-app .hero-right{display:none}
 }
