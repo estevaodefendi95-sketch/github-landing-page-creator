@@ -1,539 +1,958 @@
-:root{
-  --ink:#0a0a0a; --ink2:#1a1208; --navy:#1a2454; --navy2:#0f1535;
-  --lp-accent:#1a2454; --accentL:#e8ebf8;
-  --gray:#6b7280; --lp-muted:#9ca3af; --lp-border:#e8e8e8;
-  --pale:#f7f6f3; --cream:#f5f3ef; --white:#fff;
-  --green:#16a34a;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden}
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState, type FormEvent } from "react";
+import nortyxLogo from "@/assets/nortyx-logo.png.asset.json";
 
-/* ── NAV ── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  height:68px;padding:0 60px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(255,255,255,.96);backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--lp-border);
-  transition:box-shadow .3s;
-}
-.nav-brand{display:flex;align-items:center;gap:48px}
-.logo{font-family:'DM Sans',sans-serif;font-size:1.25rem;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
-.logo span{color:var(--lp-muted);font-weight:300}
-.nav-links{display:flex;gap:4px;list-style:none}
-.nav-links a{font-size:.85rem;font-weight:400;color:var(--gray);text-decoration:none;padding:6px 14px;border-radius:6px;transition:all .2s}
-.nav-links a:hover{color:var(--ink);background:var(--pale)}
-.nav-right{display:flex;align-items:center;gap:10px}
-.nav-ghost{font-size:.85rem;font-weight:500;color:var(--navy);text-decoration:none;padding:8px 18px;border:1px solid rgba(26,36,84,.2);border-radius:7px;transition:all .2s}
-.nav-ghost:hover{border-color:var(--navy);background:var(--accentL)}
-.nav-solid{font-size:.85rem;font-weight:600;color:var(--white);background:var(--navy);text-decoration:none;padding:9px 20px;border-radius:7px;transition:all .2s}
-.nav-solid:hover{background:#243068}
+const WHATSAPP_BASE = "https://wa.me/5516991776593";
+const WHATSAPP_HERO = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero uma consultoria financeira!")}`;
+const WHATSAPP_NAV = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, vim pelo site da Nortyx!")}`;
+const WHATSAPP_SEG = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero saber se a Nortyx atende meu setor!")}`;
+const WHATSAPP_PREMIUM = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, tenho interesse no plano Premium!")}`;
+const WHATSAPP_CTA = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero organizar as finanças do meu negócio!")}`;
+const WHATSAPP_OK = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, acabei de preencher o formulário da Nortyx!")}`;
 
-/* ── HERO ── */
-.hero{
-  min-height:100vh;
-  background:var(--cream);
-  display:grid;grid-template-columns:1fr 1fr;align-items:center;
-  padding:120px 60px 80px;
-  position:relative;overflow:hidden;
-}
-.hero::before{
-  content:'';position:absolute;
-  top:-200px;right:-200px;
-  width:600px;height:600px;
-  background:radial-gradient(ellipse,rgba(26,36,84,.04) 0%,transparent 70%);
-  border-radius:50%;
-}
+/* ════════════════════════════════════════════════════════════════
+   ⚠️  VALORES EDITÁVEIS — PLANO "APP NORTYX"  ⚠️
+   Edite apenas os valores entre aspas abaixo.
+   ════════════════════════════════════════════════════════════════ */
+const APP_PLAN = {
+  setup: "R$ 1.500",   // ← Setup inicial (pagamento único) — EDITE AQUI
+  mensal: "R$ 250",    // ← Mensalidade — EDITE AQUI
+};
+/* ════════════════════════════════════════════════════════════════ */
 
-/* linha decorativa topo */
-.hero::after{
-  content:'';position:absolute;
-  top:0;left:0;right:0;height:3px;
-  background:var(--navy);
-}
+const DIAGNOSTICO_URL = "https://nortyxdiagnostico.lovable.app";
 
-.hero-left{position:relative;z-index:1}
-.hero-eyebrow{
-  font-size:.72rem;font-weight:600;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--navy);
-  margin-bottom:24px;display:flex;align-items:center;gap:10px;
-  animation:fadeUp .8s ease both;
-}
-.hero-eyebrow::before{content:'';width:24px;height:1.5px;background:var(--navy);border-radius:2px}
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Nortyx — Consultoria Financeira" },
+      { name: "description", content: "Fluxo de caixa, DRE, planejamento e controle de inadimplência para profissionais autônomos e pequenas empresas." },
+      { property: "og:title", content: "Nortyx — Consultoria Financeira" },
+      { property: "og:description", content: "Organização financeira para quem trabalha por conta própria. Fluxo de caixa, DRE, planejamento e controle de inadimplência." },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Nortyx",
+          description: "Consultoria financeira para profissionais autônomos e pequenas empresas.",
+          email: "Nortyx.group@gmail.com",
+          telephone: "+5516991776593",
+          founder: { "@type": "Person", name: "Estevão Defendi" },
+        }),
+      },
+    ],
+  }),
+  component: LandingPage,
+});
 
-h1{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(3.2rem,5vw,5.2rem);
-  font-weight:300;line-height:.95;
-  color:var(--ink);letter-spacing:-.02em;
-  margin-bottom:28px;
-  animation:fadeUp .8s .12s ease both;
-}
-h1 em{font-style:italic;color:var(--navy)}
+type ModalState = { open: boolean; planName: string; planPrice: string };
 
-.hero-desc{
-  font-size:1.05rem;font-weight:300;color:var(--gray);
-  line-height:1.78;max-width:460px;margin-bottom:44px;
-  animation:fadeUp .8s .24s ease both;
-}
+function LandingPage() {
+  const [annual, setAnnual] = useState(false);
+  const [navShadow, setNavShadow] = useState(false);
+  const [modal, setModal] = useState<ModalState>({ open: false, planName: "Profissional", planPrice: "R$ 1.290/mês" });
+  const [submitted, setSubmitted] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
-.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;animation:fadeUp .8s .36s ease both}
-.btn-primary{
-  display:inline-flex;align-items:center;gap:9px;
-  background:var(--navy);color:var(--white);
-  padding:14px 28px;border-radius:8px;
-  font-weight:600;font-size:.9rem;text-decoration:none;
-  transition:all .25s;letter-spacing:.01em;
-}
-.btn-primary:hover{background:#243068;transform:translateY(-2px);box-shadow:0 8px 28px rgba(26,36,84,.25)}
-.btn-secondary{
-  display:inline-flex;align-items:center;gap:8px;
-  color:var(--navy);padding:14px 22px;border-radius:8px;
-  font-weight:500;font-size:.9rem;text-decoration:none;
-  border:1px solid rgba(26,36,84,.2);transition:all .25s;
-}
-.btn-secondary:hover{border-color:var(--navy);background:var(--accentL)}
+  // ── Carrossel do hero (3 banners) ──
+  const [hcSlide, setHcSlide] = useState(0);
+  const [hcPaused, setHcPaused] = useState(false);
+  const HC_TOTAL = 3;
 
-.hero-trust{
-  margin-top:52px;padding-top:36px;
-  border-top:1px solid rgba(26,36,84,.1);
-  display:flex;gap:32px;flex-wrap:wrap;
-  animation:fadeUp .8s .5s ease both;
-}
-.trust-item{display:flex;align-items:center;gap:10px}
-.trust-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--navy);line-height:1}
-.trust-text{font-size:.78rem;color:var(--lp-muted);line-height:1.4;font-weight:400}
+  useEffect(() => {
+    if (hcPaused) return;
+    const t = setInterval(() => setHcSlide((s) => (s + 1) % HC_TOTAL), 7000);
+    return () => clearInterval(t);
+  }, [hcPaused]);
 
-/* hero right — painel visual */
-.hero-right{position:relative;z-index:1;display:flex;justify-content:flex-end;animation:fadeLeft 1s .2s ease both}
-.panel{
-  background:var(--white);border-radius:16px;
-  padding:32px;width:380px;
-  box-shadow:0 24px 64px rgba(26,36,84,.09),0 2px 12px rgba(26,36,84,.05);
-  border:1px solid var(--lp-border);
-}
-.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-.panel-title{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--lp-muted)}
-.panel-live{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--green);font-weight:600}
-.panel-live::before{content:'';width:5px;height:5px;background:var(--green);border-radius:50%;animation:blink 1.6s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  // ── Mini-diagnóstico interativo (banner 2) ──
+  const [diagVal, setDiagVal] = useState(5);
+  const diagFeedback =
+    diagVal <= 3
+      ? { icon: "🔴", txt: "Sinal de alerta: sem controle, o lucro escapa sem você perceber." }
+      : diagVal <= 7
+        ? { icon: "🟡", txt: "Você tem noção do caixa, mas ainda decide no escuro em parte do mês." }
+        : { icon: "🟢", txt: "Ótimo ponto de partida! O diagnóstico mostra como ir além." };
 
-.panel-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-.metric-box{background:var(--pale);border-radius:10px;padding:16px}
-.metric-lbl{font-size:.68rem;color:var(--lp-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
-.metric-val{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--ink);line-height:1}
-.metric-sub{font-size:.68rem;color:var(--green);margin-top:3px;font-weight:500}
+  function scrollToAppPlan() {
+    document.getElementById("plano-app")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 
-.panel-divider{height:1px;background:var(--lp-border);margin-bottom:20px}
+  // Scroll-reveal + nav shadow
+  useEffect(() => {
+    const onScroll = () => setNavShadow(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
-.panel-rows{display:flex;flex-direction:column;gap:10px}
-.panel-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--lp-border)}
-.panel-row:last-child{border-bottom:none}
-.row-icon{width:32px;height:32px;background:var(--pale);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
-.row-label{flex:1;font-size:.82rem;color:var(--ink);font-weight:400}
-.row-val{font-size:.8rem;font-weight:600;color:var(--navy)}
+    const els = document.querySelectorAll(".rv");
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e, i) => {
+          if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add("in"), i * 55);
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.08 },
+    );
+    els.forEach((el) => obs.observe(el));
 
-/* float chips */
-.float-chip{
-  position:absolute;background:var(--white);border-radius:10px;
-  padding:12px 16px;box-shadow:0 8px 28px rgba(26,36,84,.1);
-  border:1px solid var(--lp-border);font-size:.75rem;
-}
-.fc1{top:20px;left:-80px;animation:floatA 3.2s ease-in-out infinite}
-.fc2{bottom:30px;left:-90px;animation:floatB 3.8s ease-in-out infinite}
-@keyframes floatA{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes floatB{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
-.fc-icon{font-size:1rem;margin-bottom:2px}
-.fc-label{color:var(--lp-muted);font-size:.65rem}
-.fc-val{font-weight:700;color:var(--ink);font-size:.82rem}
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeModal();
+      if (e.ctrlKey && e.shiftKey && (e.key === "E" || e.key === "e")) {
+        e.preventDefault();
+        setEditMode((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
 
-/* ── NÚMEROS ── */
-.numbers{background:var(--navy);padding:0 60px;border-bottom:1px solid rgba(255,255,255,.06)}
-.numbers-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-.num-item{padding:36px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
-.num-item:last-child{border-right:none}
-.num-val{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:400;color:var(--white);line-height:1;margin-bottom:6px}
-.num-val em{font-style:normal;color:rgba(255,255,255,.4);font-size:1.8rem}
-.num-label{font-size:.75rem;color:rgba(255,255,255,.35);font-weight:300;line-height:1.5}
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("keydown", onKey);
+      obs.disconnect();
+    };
+  }, []);
 
-/* ── COMMON ── */
-section{padding:100px 60px}
-.section-inner{max-width:1080px;margin:0 auto}
-.s-tag{font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.s-tag::before{content:'';width:20px;height:1.5px;background:var(--navy);border-radius:2px}
-.s-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,3.5vw,3.2rem);font-weight:300;line-height:1;letter-spacing:-.02em;color:var(--ink);margin-bottom:20px}
-.s-title em{font-style:italic;color:var(--navy)}
-.s-sub{font-size:1rem;color:var(--gray);font-weight:300;line-height:1.78;max-width:520px}
+  // Lock scroll while modal open
+  useEffect(() => {
+    document.body.style.overflow = modal.open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [modal.open]);
 
-/* ── SERVIÇOS ── */
-.svc-bg{background:var(--cream)}
-.svc-layout{display:grid;grid-template-columns:1fr 2fr;gap:80px;align-items:start}
-.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--lp-border);border:1px solid var(--lp-border);border-radius:12px;overflow:hidden}
-.svc-card{background:var(--white);padding:32px 28px;transition:background .2s}
-.svc-card:hover{background:var(--cream)}
-.svc-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:rgba(26,36,84,.15);line-height:1;margin-bottom:16px}
-.svc-name{font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:10px}
-.svc-desc{font-size:.85rem;color:var(--gray);line-height:1.7;font-weight:300}
-.svc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}
-.svc-tag{font-size:.68rem;font-weight:500;padding:3px 9px;border-radius:100px;background:var(--accentL);color:var(--navy)}
+  function openModal(planName: string, planPrice: string) {
+    setSubmitted(false);
+    setModal({ open: true, planName, planPrice });
+  }
+  function closeModal() {
+    setModal((m) => ({ ...m, open: false }));
+  }
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitted(true);
+  }
 
-/* ── PARA QUEM ── */
-.paraquem-bg{background:var(--white)}
-.paraquem-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;margin-bottom:60px}
-.paraquem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.pq-card{border:1px solid var(--lp-border);border-radius:12px;padding:28px 24px;transition:all .28s;cursor:default;position:relative}
-.pq-card:hover{border-color:var(--navy);box-shadow:0 12px 36px rgba(26,36,84,.07);transform:translateY(-3px)}
-.pq-card.featured{background:var(--navy);border-color:transparent}
-.pq-icon{font-size:1.8rem;margin-bottom:14px;display:block}
-.pq-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:400;color:var(--ink);margin-bottom:8px;line-height:1.1}
-.pq-card.featured .pq-name{color:var(--white)}
-.pq-desc{font-size:.82rem;color:var(--gray);line-height:1.6;font-weight:300}
-.pq-card.featured .pq-desc{color:rgba(255,255,255,.4)}
-.pq-features{margin-top:16px;display:flex;flex-direction:column;gap:7px}
-.pq-feat{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--gray)}
-.pq-card.featured .pq-feat{color:rgba(255,255,255,.5)}
-.pq-feat::before{content:'';width:4px;height:4px;background:var(--navy);border-radius:50%;flex-shrink:0}
-.pq-card.featured .pq-feat::before{background:rgba(255,255,255,.3)}
-.pq-more{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;border:1.5px dashed rgba(26,36,84,.15);border-radius:12px;padding:28px 24px;transition:all .28s}
-.pq-more:hover{border-color:var(--navy);background:var(--accentL)}
-.pq-more-text{font-size:.82rem;font-weight:500;color:var(--navy)}
+  const plans = {
+    essencial: { m: "R$ 790", a: "R$ 632" },
+    pro: { m: "R$ 1.290", a: "R$ 1.032" },
+  } as const;
 
-/* ── PROCESSO ── */
-.processo-bg{background:var(--cream)}
-.processo-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:64px}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
-.steps::before{content:'';position:absolute;top:24px;left:calc(12.5% + 4px);right:calc(12.5% + 4px);height:1px;background:var(--lp-border)}
-.step{text-align:center;padding:0 8px}
-.step-num{width:48px;height:48px;background:var(--white);border:1px solid var(--lp-border);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;color:var(--navy);transition:all .3s}
-.step:hover .step-num{background:var(--navy);border-color:var(--navy);color:var(--white)}
-.step-name{font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:8px}
-.step-desc{font-size:.78rem;color:var(--lp-muted);line-height:1.6;font-weight:300}
+  return (
+    <div
+      contentEditable={editMode}
+      suppressContentEditableWarning
+      style={editMode ? { outline: "2px dashed #1a2454", outlineOffset: -4 } : undefined}
+    >
+      {editMode && (
+        <div style={{ position: "fixed", top: 12, right: 12, zIndex: 9999, background: "#1a2454", color: "#fff", padding: "8px 14px", borderRadius: 999, fontSize: 13, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(0,0,0,.2)" }}>
+          ✏️ Modo edição ativo — Ctrl+Shift+E para sair
+        </div>
+      )}
+      {/* NAV */}
+      <nav id="nav" style={{ boxShadow: navShadow ? "0 4px 20px rgba(10,10,10,.07)" : "none" }}>
 
-/* ── PLANOS ── */
-.planos-bg{background:var(--white)}
-.plans-head{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:52px}
-.billing-toggle{display:flex;align-items:center;gap:12px;margin-top:20px}
-.tgl-lbl{font-size:.82rem;color:var(--lp-muted);font-weight:400;transition:color .2s}
-.tgl-lbl.on{color:var(--ink);font-weight:600}
-.tgl{position:relative;width:44px;height:22px;cursor:pointer}
-.tgl input{opacity:0;width:0;height:0}
-.tgl-track{position:absolute;inset:0;background:var(--lp-border);border-radius:100px;transition:.25s}
-.tgl-thumb{position:absolute;width:14px;height:14px;top:4px;left:4px;background:var(--white);border-radius:50%;transition:.25s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-.tgl input:checked~.tgl-track{background:var(--navy)}
-.tgl input:checked~.tgl-thumb{left:26px}
-.annual-badge{background:rgba(22,163,74,.1);color:var(--green);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
+        <div className="nav-brand">
+          <a href="#" className="logo" aria-label="Nortyx">
+            <img src={nortyxLogo.url} alt="Nortyx" style={{ height: 80, width: "auto", display: "block", objectFit: "contain" }} />
+          </a>
+          <ul className="nav-links">
+            <li><a href="#servicos">Serviços</a></li>
+            <li><a href="#paraquem">Para quem</a></li>
+            <li><a href="#processo">Como funciona</a></li>
+            <li><a href="#planos">Planos</a></li>
+            <li><a href="#depoimentos">Clientes</a></li>
+            <li><a href="#diagnostico">Diagnóstico</a></li>
+          </ul>
+        </div>
+        <div className="nav-right">
+          <a href="#planos" className="nav-ghost">Ver planos</a>
+          <a href={WHATSAPP_NAV} target="_blank" rel="noreferrer" className="nav-solid">💬 Falar agora</a>
+        </div>
+      </nav>
 
-.plans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--lp-border);border:1px solid var(--lp-border);border-radius:16px;overflow:hidden}
-@media(max-width:1200px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
-.plan{background:var(--white);padding:34px 26px;position:relative;transition:background .2s}
-.plan:hover{background:var(--cream)}
-.plan.hot{background:var(--navy)}
-.plan.hot:hover{background:#243068}
-.plan-badge{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:.65rem;font-weight:700;padding:4px 10px;border-radius:100px;letter-spacing:.06em}
-.plan-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--ink);margin-bottom:6px;line-height:1}
-.plan.hot .plan-name{color:var(--white)}
-.plan-tagline{font-size:.8rem;color:var(--lp-muted);margin-bottom:24px;font-weight:300;line-height:1.5}
-.plan.hot .plan-tagline{color:rgba(255,255,255,.35)}
-.plan-price{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--ink);letter-spacing:-.02em;line-height:1;margin-bottom:4px}
-.plan.hot .plan-price{color:var(--white)}
-.plan-period{font-size:.75rem;color:var(--lp-muted);margin-bottom:24px}
-.plan.hot .plan-period{color:rgba(255,255,255,.3)}
-.plan-annual{display:none;font-size:.72rem;color:var(--green);margin-bottom:20px;font-weight:500}
-.plan-sep{height:1px;background:var(--lp-border);margin-bottom:22px}
-.plan.hot .plan-sep{background:rgba(255,255,255,.08)}
-.plan-feats{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
-.plan-feat{display:flex;align-items:flex-start;gap:9px;font-size:.82rem;color:var(--gray);font-weight:300}
-.plan.hot .plan-feat{color:rgba(255,255,255,.6)}
-.feat-ok{color:var(--green);flex-shrink:0;font-size:.85rem;margin-top:1px}
-.feat-no{color:var(--lp-border)}
-.plan-btn{display:block;text-align:center;padding:12px;border-radius:8px;font-weight:600;font-size:.875rem;text-decoration:none;transition:all .25s;font-family:'DM Sans',sans-serif}
-.plan-btn-out{border:1px solid rgba(26,36,84,.18);color:var(--navy)}
-.plan-btn-out:hover{border-color:var(--navy);background:var(--accentL)}
-.plan-btn-fill{background:white;color:var(--navy)}
-.plan-btn-fill:hover{background:var(--cream)}
-.plans-note{text-align:center;font-size:.75rem;color:var(--lp-muted);margin-top:24px}
+      {/* HERO — CARROSSEL COM 3 BANNERS */}
+      <div
+        className="hero-carousel"
+        onMouseEnter={() => setHcPaused(true)}
+        onMouseLeave={() => setHcPaused(false)}
+      >
+        <div className="hc-track">
 
-/* ── DEPOIMENTOS ── */
-.dep-bg{background:var(--cream)}
-.dep-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:52px}
-.dep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--lp-border);border:1px solid var(--lp-border);border-radius:12px;overflow:hidden}
-.dep{background:var(--white);padding:32px 28px;transition:background .2s}
-.dep:hover{background:var(--cream)}
-.dep-quote{font-family:'Cormorant Garamond',serif;font-size:3rem;line-height:1;color:rgba(26,36,84,.08);font-weight:300;margin-bottom:-4px}
-.dep-text{font-size:.875rem;color:#374151;line-height:1.78;font-style:italic;margin-bottom:22px;font-weight:300}
-.dep-author{display:flex;align-items:center;gap:12px}
-.dep-avatar{width:38px;height:38px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--white);flex-shrink:0}
-.dep-name{font-size:.85rem;font-weight:600;color:var(--ink)}
-.dep-role{font-size:.72rem;color:var(--lp-muted);font-weight:300}
-.dep-stars{color:#f59e0b;font-size:.7rem;margin-bottom:2px}
+        {/* ── BANNER 1 · Consultoria (original, sem alterações) ── */}
+        <section className={`hero hc-slide ${hcSlide === 0 ? "hc-active" : ""}`}>
+        <div className="hero-left">
+          <div className="hero-eyebrow">Consultoria Financeira</div>
+          <h1>
+            Organização<br />financeira para<br />quem trabalha<br />por <em>conta própria.</em>
+          </h1>
+          <p className="hero-desc">
+            Fluxo de caixa, DRE, planejamento e controle de inadimplência. Tudo o que o seu negócio precisa para crescer com previsibilidade — sem surpresas no fim do mês.
+          </p>
+          <div className="hero-ctas">
+            <a href={WHATSAPP_HERO} target="_blank" rel="noreferrer" className="btn-primary">💬 Falar pelo WhatsApp</a>
+            <a href="#planos" className="btn-secondary">Ver planos →</a>
+          </div>
+          <div className="hero-trust">
+            <div className="trust-item">
+              <div className="trust-num">10+</div>
+              <div className="trust-text">setores<br />atendidos</div>
+            </div>
+            <div style={{ width: 1, height: 36, background: "var(--lp-border)" }} />
+            <div className="trust-item">
+              <div className="trust-num">–60%</div>
+              <div className="trust-text">redução de<br />inadimplência</div>
+            </div>
+            <div style={{ width: 1, height: 36, background: "var(--lp-border)" }} />
+            <div className="trust-item">
+              <div className="trust-num">30d</div>
+              <div className="trust-text">resultado<br />visível</div>
+            </div>
+          </div>
+        </div>
 
-/* ── CTA FINAL ── */
-.cta-final{background:var(--navy);padding:100px 60px;text-align:center;position:relative;overflow:hidden}
-.cta-final::before{content:'';position:absolute;top:-300px;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(ellipse,rgba(255,255,255,.03) 0%,transparent 65%);border-radius:50%}
-.cta-final .s-title{color:var(--white);max-width:600px;margin:0 auto 20px;font-size:clamp(2.5rem,4vw,4rem)}
-.cta-final .s-title em{color:rgba(255,255,255,.4)}
-.cta-final .s-sub{color:rgba(255,255,255,.35);margin:0 auto 48px;text-align:center;max-width:440px}
-.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
-.cta-white{display:inline-flex;align-items:center;gap:9px;background:var(--white);color:var(--navy);padding:14px 32px;border-radius:8px;font-weight:700;font-size:.9rem;text-decoration:none;transition:all .25s;box-shadow:0 4px 20px rgba(0,0,0,.15)}
-.cta-white:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.2)}
-.cta-ghost-w{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.65);padding:14px 26px;border-radius:8px;font-weight:500;font-size:.9rem;text-decoration:none;transition:all .25s}
-.cta-ghost-w:hover{border-color:rgba(255,255,255,.45);color:var(--white);background:rgba(255,255,255,.05)}
+        <div className="hero-right">
+          <div style={{ position: "relative" }}>
+            <div className="float-chip fc1">
+              <div className="fc-icon">📈</div>
+              <div className="fc-label">Receita mensal</div>
+              <div className="fc-val">+34% este mês</div>
+            </div>
+            <div className="float-chip fc2">
+              <div className="fc-icon">✅</div>
+              <div className="fc-label">Cobranças em dia</div>
+              <div className="fc-val">87% dos clientes</div>
+            </div>
+            <div className="panel">
+              <div className="panel-header">
+                <span className="panel-title">Painel Financeiro</span>
+                <span className="panel-live">Ao vivo</span>
+              </div>
+              <div className="panel-metrics">
+                <div className="metric-box">
+                  <div className="metric-lbl">Receita</div>
+                  <div className="metric-val">R$48k</div>
+                  <div className="metric-sub">▲ 12% vs mês ant.</div>
+                </div>
+                <div className="metric-box">
+                  <div className="metric-lbl">Inadimplência</div>
+                  <div className="metric-val">3,2%</div>
+                  <div className="metric-sub">▼ reduzida</div>
+                </div>
+              </div>
+              <div className="panel-divider" />
+              <div className="panel-rows">
+                <div className="panel-row">
+                  <div className="row-icon">📊</div>
+                  <div className="row-label">DRE do mês</div>
+                  <div className="row-val" style={{ color: "var(--green)" }}>Gerado</div>
+                </div>
+                <div className="panel-row">
+                  <div className="row-icon">🎯</div>
+                  <div className="row-label">Meta mensal</div>
+                  <div className="row-val">94%</div>
+                </div>
+                <div className="panel-row">
+                  <div className="row-icon">📅</div>
+                  <div className="row-label">Próxima reunião</div>
+                  <div className="row-val">Sex, 14h</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-/* ── FOOTER ── */
-footer{background:#060912;padding:52px 60px 32px}
-.footer-inner{max-width:1080px;margin:0 auto}
-.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:24px}
-.footer-logo{font-family:'DM Sans',sans-serif;font-size:1.25rem;font-weight:700;color:var(--white);text-decoration:none;letter-spacing:-.01em;display:block;margin-bottom:10px}
-.footer-logo span{color:rgba(255,255,255,.25);font-weight:300}
-.footer-tagline{font-size:.78rem;color:rgba(255,255,255,.2);line-height:1.7;font-weight:300;max-width:200px}
-.footer-col-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.2);margin-bottom:14px}
-.footer-links{display:flex;flex-direction:column;gap:8px}
-.footer-links a{font-size:.8rem;color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s}
-.footer-links a:hover{color:var(--white)}
-.footer-contact a{font-size:.8rem;color:rgba(255,255,255,.3);text-decoration:none;display:block;margin-bottom:6px;transition:color .2s}
-.footer-contact a:hover{color:var(--white)}
-.footer-wa{display:inline-flex;align-items:center;gap:8px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.2);color:var(--green);padding:9px 14px;border-radius:7px;font-size:.78rem;font-weight:600;text-decoration:none;margin-top:12px;transition:all .2s}
-.footer-wa:hover{background:rgba(22,163,74,.18)}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.footer-copy,.footer-by{font-size:.72rem;color:rgba(255,255,255,.12);font-weight:300}
+        {/* ── BANNER 2 · Diagnóstico interativo ── */}
+        <section className={`hero hero-diag hc-slide ${hcSlide === 1 ? "hc-active" : ""}`}>
+          <div className="hero-left">
+            <div className="hero-eyebrow">Diagnóstico gratuito · 5 minutos</div>
+            <h1>
+              Descubra a saúde<br />financeira do seu<br /><em>negócio agora.</em>
+            </h1>
+            <p className="hero-desc">
+              Responda 20 perguntas rápidas e receba na hora seu score financeiro de 0 a 100, com análise de controle, inadimplência, planejamento e crescimento.
+            </p>
+            <div className="hero-ctas">
+              <a href={DIAGNOSTICO_URL} target="_blank" rel="noreferrer" className="btn-primary">📊 Fazer diagnóstico gratuito</a>
+              <a href="#diagnostico" className="btn-secondary">Saber mais →</a>
+            </div>
+            <div className="hero-trust">
+              <div className="trust-item">
+                <div className="trust-num">20</div>
+                <div className="trust-text">perguntas<br />rápidas</div>
+              </div>
+              <div style={{ width: 1, height: 36, background: "var(--lp-border)" }} />
+              <div className="trust-item">
+                <div className="trust-num">5min</div>
+                <div className="trust-text">resultado<br />imediato</div>
+              </div>
+              <div style={{ width: 1, height: 36, background: "var(--lp-border)" }} />
+              <div className="trust-item">
+                <div className="trust-num">R$0</div>
+                <div className="trust-text">100% gratuito<br />e confidencial</div>
+              </div>
+            </div>
+          </div>
+          <div className="hero-right">
+            <div className="panel diag-mini">
+              <div className="panel-header">
+                <span className="panel-title">Teste rápido</span>
+                <span className="panel-live">Interativo</span>
+              </div>
+              <div className="dm-q">
+                De 0 a 10, quanto <strong>controle</strong> você tem hoje sobre o caixa do seu negócio?
+              </div>
+              <div className="dm-score-row">
+                <div className="dm-score">{diagVal}</div>
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  value={diagVal}
+                  onChange={(e) => setDiagVal(Number(e.target.value))}
+                  className="dm-range"
+                  aria-label="Nível de controle do caixa"
+                />
+              </div>
+              <div className="dm-msg">
+                <span>{diagFeedback.icon}</span> {diagFeedback.txt}
+              </div>
+              <a href={DIAGNOSTICO_URL} target="_blank" rel="noreferrer" className="diag-cta">
+                Fazer o diagnóstico completo →
+              </a>
+              <div className="diag-note">Score financeiro completo · Sem cadastro de cartão</div>
+            </div>
+          </div>
+        </section>
 
-/* ── MODAL ── */
-.modal-ov{display:none;position:fixed;inset:0;background:rgba(10,10,10,.6);backdrop-filter:blur(8px);z-index:300;align-items:center;justify-content:center;padding:20px}
-.modal-ov.open{display:flex}
-.modal-box{background:var(--white);border-radius:16px;width:100%;max-width:480px;padding:40px;position:relative;animation:modalIn .3s ease;max-height:90vh;overflow-y:auto}
-@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(16px)}}
-.modal-x{position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--lp-muted);padding:6px;line-height:1}
-.modal-x:hover{color:var(--ink)}
-.modal-h{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--ink);margin-bottom:4px;line-height:1}
-.modal-sub{font-size:.82rem;color:var(--lp-muted);margin-bottom:20px;font-weight:300;line-height:1.6}
-.modal-plan-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accentL);border:1px solid rgba(26,36,84,.12);padding:8px 14px;border-radius:7px;margin-bottom:22px}
-.modal-plan-badge span:first-child{font-size:.85rem;font-weight:700;color:var(--navy)}
-.modal-plan-badge span:last-child{font-size:.82rem;color:var(--navy);opacity:.6}
-.fg{margin-bottom:14px}
-.fl{display:block;font-size:.75rem;font-weight:600;color:var(--ink);margin-bottom:5px;letter-spacing:.02em}
-.fi,.fs{width:100%;padding:11px 13px;border:1px solid var(--lp-border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--ink);outline:none;transition:border .2s;background:var(--white)}
-.fi:focus,.fs:focus{border-color:var(--navy)}
-.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fsub{width:100%;padding:13px;background:var(--navy);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s;margin-top:6px}
-.fsub:hover{background:#243068}
-.fnote{font-size:.7rem;color:var(--lp-muted);text-align:center;margin-top:10px}
-.modal-ok{display:none;text-align:center;padding:16px 0}
-.modal-ok-ico{font-size:2.8rem;margin-bottom:14px}
-.modal-ok-h{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--ink);margin-bottom:8px}
-.modal-ok-p{font-size:.875rem;color:var(--gray);line-height:1.7;font-weight:300}
-.modal-ok-btn{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:12px 26px;background:var(--navy);color:var(--white);border-radius:8px;font-weight:600;font-size:.875rem;text-decoration:none;border:none;cursor:pointer}
+        {/* ── BANNER 3 · App Nortyx ── */}
+        <section className={`hero hero-app hc-slide ${hcSlide === 2 ? "hc-active" : ""}`}>
+          <div className="hero-left">
+            <div className="hero-eyebrow">App Nortyx · Gestão financeira</div>
+            <h1>
+              Todo o seu financeiro<br />em um único <em>aplicativo.</em>
+            </h1>
+            <p className="hero-desc">
+              Fluxo de caixa, DRE automático, contas a pagar e receber, cobranças e metas — direto do celular ou computador. Adquira somente o app, com implantação inclusa.
+            </p>
+            <div className="hero-ctas">
+              <button type="button" onClick={scrollToAppPlan} className="btn-primary">
+                💻 Quero o App Nortyx →
+              </button>
+              <a href="#planos" className="btn-secondary">Ver todos os planos</a>
+            </div>
+            <div className="hero-trust">
+              <div className="trust-item">
+                <div className="trust-num">{APP_PLAN.mensal}</div>
+                <div className="trust-text">por mês<br />+ setup inicial</div>
+              </div>
+              <div style={{ width: 1, height: 36, background: "var(--lp-border)" }} />
+              <div className="trust-item">
+                <div className="trust-num">PWA</div>
+                <div className="trust-text">instale no<br />seu celular</div>
+              </div>
+              <div style={{ width: 1, height: 36, background: "var(--lp-border)" }} />
+              <div className="trust-item">
+                <div className="trust-num">24h</div>
+                <div className="trust-text">seus dados<br />sempre à mão</div>
+              </div>
+            </div>
+          </div>
+          <div className="hero-right">
+            <div style={{ position: "relative" }}>
+              <div className="float-chip fc1">
+                <div className="fc-icon">🔔</div>
+                <div className="fc-label">Cobrança automática</div>
+                <div className="fc-val">3 boletos enviados</div>
+              </div>
+              <div className="float-chip fc2">
+                <div className="fc-icon">📱</div>
+                <div className="fc-label">Disponível em</div>
+                <div className="fc-val">Celular e computador</div>
+              </div>
+              <div className="panel">
+                <div className="panel-header">
+                  <span className="panel-title">App Nortyx</span>
+                  <span className="panel-live">Ao vivo</span>
+                </div>
+                <div className="panel-metrics">
+                  <div className="metric-box">
+                    <div className="metric-lbl">Saldo em caixa</div>
+                    <div className="metric-val">R$32k</div>
+                    <div className="metric-sub">▲ atualizado agora</div>
+                  </div>
+                  <div className="metric-box">
+                    <div className="metric-lbl">A receber</div>
+                    <div className="metric-val">R$18k</div>
+                    <div className="metric-sub">▲ 12 clientes</div>
+                  </div>
+                </div>
+                <div className="panel-divider" />
+                <div className="panel-rows">
+                  <div className="panel-row">
+                    <div className="row-icon">📊</div>
+                    <div className="row-label">DRE automático</div>
+                    <div className="row-val" style={{ color: "var(--green)" }}>Gerado</div>
+                  </div>
+                  <div className="panel-row">
+                    <div className="row-icon">💳</div>
+                    <div className="row-label">Contas a pagar</div>
+                    <div className="row-val">Em dia</div>
+                  </div>
+                  <div className="panel-row">
+                    <div className="row-icon">🎯</div>
+                    <div className="row-label">Meta do mês</div>
+                    <div className="row-val">88%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-/* ── ANIMAÇÕES ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
-@keyframes fadeLeft{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
-.rv{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
-.rv.in{opacity:1;transform:none}
+        </div>
 
-/* ── RESPONSIVE ── */
-@media(max-width:1060px){
-  nav{padding:0 28px}
-  .nav-links{display:none}
-  .hero{grid-template-columns:1fr;padding:110px 28px 64px}
-  .hero-right{display:none}
-  .numbers{padding:0 28px}
-  .numbers-inner{grid-template-columns:repeat(2,1fr)}
-  .num-item{border-bottom:1px solid rgba(255,255,255,.06)}
-  section{padding:72px 28px}
-  .svc-layout,.paraquem-layout,.processo-layout,.plans-head,.dep-layout{grid-template-columns:1fr;gap:32px}
-  .paraquem-grid{grid-template-columns:1fr 1fr}
-  .svc-grid{grid-template-columns:1fr}
-  .steps{grid-template-columns:repeat(2,1fr)}
-  .steps::before{display:none}
-  .plans-grid{grid-template-columns:1fr}
-  .dep-grid{grid-template-columns:1fr}
-  .footer-top{grid-template-columns:1fr 1fr;gap:28px}
-  .footer-bottom{flex-direction:column;text-align:center}
-  .cta-final{padding:72px 28px}
-  footer{padding:40px 28px 24px}
-  .fr2{grid-template-columns:1fr}
-}
+        {/* Controles do carrossel */}
+        <button
+          type="button"
+          className="hc-arrow hc-prev"
+          aria-label="Banner anterior"
+          onClick={() => setHcSlide((s) => (s - 1 + HC_TOTAL) % HC_TOTAL)}
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          className="hc-arrow hc-next"
+          aria-label="Próximo banner"
+          onClick={() => setHcSlide((s) => (s + 1) % HC_TOTAL)}
+        >
+          ›
+        </button>
+        <div className="hc-dots">
+          {["Consultoria", "Diagnóstico", "App Nortyx"].map((label, i) => (
+            <button
+              key={label}
+              type="button"
+              className={`hc-dot ${hcSlide === i ? "on" : ""}`}
+              aria-label={`Ir para banner: ${label}`}
+              onClick={() => setHcSlide(i)}
+            >
+              <span className="hc-dot-label">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
-/* ── EDIT MODE ── */
-.edit-mode [contenteditable]{
-  outline:2px dashed rgba(59,79,168,.4);
-  border-radius:4px;
-  background:rgba(59,79,168,.04);
-  cursor:text;
-  transition:all .2s;
-  min-width:20px;
-  display:inline-block;
-}
-.edit-mode [contenteditable]:hover{outline-color:var(--navy);background:rgba(59,79,168,.08)}
-.edit-mode [contenteditable]:focus{outline:2px solid var(--navy);background:rgba(59,79,168,.06)}
-.edit-toolbar{
-  display:none;position:fixed;bottom:28px;right:28px;
-  background:var(--navy-deep,#0f1535);color:var(--white);
-  padding:14px 22px;border-radius:14px;
-  font-size:.8rem;font-weight:600;
-  box-shadow:0 8px 40px rgba(0,0,0,.35);
-  z-index:9999;align-items:center;gap:14px;
-  white-space:nowrap;border:1px solid rgba(255,255,255,.08);
-}
-.edit-toolbar.show{display:flex}
-.edit-toolbar button{
-  background:rgba(255,255,255,.15);color:var(--white);
-  border:none;padding:6px 14px;border-radius:100px;
-  font-size:.75rem;font-weight:700;cursor:pointer;
-  font-family:inherit;transition:background .2s;
-}
-.edit-toolbar button:hover{background:rgba(255,255,255,.25)}
-.edit-toolbar button.save-btn{background:var(--green);color:var(--white)}
-.edit-toolbar button.save-btn:hover{background:#15803d}
-.edit-hint{
-  display:none;position:absolute;top:-28px;left:0;
-  background:var(--navy);color:var(--white);
-  font-size:.65rem;font-weight:600;padding:3px 8px;border-radius:4px;
-  white-space:nowrap;pointer-events:none;
-}
-.edit-mode [contenteditable]:hover .edit-hint{display:block}
+      {/* NÚMEROS */}
+      <div className="numbers">
+        <div className="numbers-inner">
+          <div className="num-item rv"><div className="num-val">10<em>+</em></div><div className="num-label">Setores<br />atendidos</div></div>
+          <div className="num-item rv"><div className="num-val">–60<em>%</em></div><div className="num-label">Redução de<br />inadimplência</div></div>
+          <div className="num-item rv"><div className="num-val">30<em>d</em></div><div className="num-label">Primeiros<br />resultados</div></div>
+          <div className="num-item rv"><div className="num-val">100<em>%</em></div><div className="num-label">Sob medida para<br />o seu negócio</div></div>
+        </div>
+      </div>
 
-/* ── DIAGNÓSTICO SECTION ── */
-.diag-bg{background:var(--navy)}
-.diag-inner{max-width:1080px;margin:0 auto;padding:100px 60px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-.diag-left .s-tag{color:rgba(124,155,255,.7)}
-.diag-left .s-title{color:var(--white)}
-.diag-left .s-title em{color:rgba(255,255,255,.35)}
-.diag-left .s-sub{color:rgba(255,255,255,.38);max-width:420px}
-.diag-steps{display:flex;flex-direction:column;gap:16px;margin-top:32px}
-.diag-step{display:flex;align-items:flex-start;gap:14px}
-.diag-step-num{
-  width:32px;height:32px;background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.15);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.75rem;font-weight:800;color:rgba(255,255,255,.6);flex-shrink:0;
-  margin-top:2px;
-}
-.diag-step-text{font-size:.88rem;color:rgba(255,255,255,.5);line-height:1.6;font-weight:300}
-.diag-step-text strong{color:rgba(255,255,255,.85);font-weight:600;display:block;margin-bottom:2px}
-.diag-card{
-  background:var(--white);border-radius:20px;
-  padding:40px 36px;
-  box-shadow:0 32px 80px rgba(0,0,0,.2);
-  position:relative;overflow:hidden;
-}
-.diag-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:4px;
-  background:linear-gradient(90deg,var(--navy),var(--lp-accent));
-}
-.diag-card-tag{
-  font-size:.68rem;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--lp-muted);margin-bottom:12px;
-}
-.diag-card-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.8rem;font-weight:300;color:var(--ink);
-  line-height:1;letter-spacing:-.02em;margin-bottom:8px;
-}
-.diag-card-desc{font-size:.85rem;color:var(--gray);font-weight:300;line-height:1.65;margin-bottom:28px}
-.diag-features{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
-.diag-feature{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--ink)}
-.diag-feature-icon{
-  width:22px;height:22px;background:rgba(22,163,74,.1);
-  border:1px solid rgba(22,163,74,.2);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.75rem;color:var(--green);flex-shrink:0;font-weight:700;
-}
-.diag-cta{
-  display:flex;align-items:center;justify-content:center;
-  gap:10px;width:100%;padding:14px;
-  background:var(--navy);color:var(--white);
-  border-radius:10px;text-decoration:none;
-  font-weight:700;font-size:.95rem;transition:all .25s;
-  border:none;cursor:pointer;font-family:inherit;
-}
-.diag-cta:hover{background:var(--lp-accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(26,36,84,.3)}
-.diag-note{font-size:.72rem;color:var(--lp-muted);text-align:center;margin-top:10px}
+      {/* SERVIÇOS */}
+      <section id="servicos" className="svc-bg">
+        <div className="section-inner">
+          <div className="svc-layout">
+            <div>
+              <div className="s-tag rv">O que entregamos</div>
+              <h2 className="s-title rv">Consultoria<br />financeira<br /><em>completa.</em></h2>
+              <p className="s-sub rv" style={{ marginTop: 0 }}>
+                Cada entrega é pensada para dar a você clareza total sobre o dinheiro do seu negócio — e um caminho concreto para crescer.
+              </p>
+            </div>
+            <div className="svc-grid">
+              {[
+                { n: "01", name: "Diagnóstico Financeiro", desc: "Análise completa da situação atual: onde entra, onde sai, o que sobra. Identificamos os gargalos que estão travando o crescimento do seu negócio.", tags: ["Diagnóstico", "Análise"] },
+                { n: "02", name: "Fluxo de Caixa", desc: "Controle detalhado de todas as entradas e saídas. Você passa a saber exatamente quanto vai sobrar — antes do mês acabar.", tags: ["Fluxo de caixa", "Projeções"] },
+                { n: "03", name: "DRE Simplificado", desc: "Demonstrativo de resultados mensal em linguagem clara — sem jargão contábil. Você entende o que lucrou e por quê.", tags: ["DRE", "Relatórios"] },
+                { n: "04", name: "Planejamento Financeiro", desc: "Metas claras, orçamento estruturado e plano de ação para os próximos meses. Crescimento com previsibilidade e propósito.", tags: ["Metas", "Orçamento"] },
+                { n: "05", name: "Controle de Inadimplência", desc: "Mapeamento de clientes em atraso, estratégias de cobrança e processos para reduzir a inadimplência e aumentar a previsibilidade da receita.", tags: ["Recebíveis", "Cobrança"] },
+                { n: "06", name: "Reuniões Mensais", desc: "Acompanhamento dedicado com Estevão: revisão dos resultados, ajuste de metas e alinhamento estratégico para o próximo período.", tags: ["Mentoria", "Acompanhamento"] },
+              ].map((s) => (
+                <div key={s.n} className="svc-card rv">
+                  <div className="svc-num">{s.n}</div>
+                  <div className="svc-name">{s.name}</div>
+                  <div className="svc-desc">{s.desc}</div>
+                  <div className="svc-tags">
+                    {s.tags.map((t) => <span key={t} className="svc-tag">{t}</span>)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-@media(max-width:1060px){
-  .diag-inner{grid-template-columns:1fr;gap:40px;padding:64px 28px}
-}
+      {/* PARA QUEM */}
+      <section id="paraquem" className="paraquem-bg">
+        <div className="section-inner">
+          <div className="paraquem-layout">
+            <div>
+              <div className="s-tag rv">Para quem é</div>
+              <h2 className="s-title rv">Para quem trabalha<br />duro e merece<br /><em>ver resultado.</em></h2>
+            </div>
+            <p className="s-sub rv">
+              Se você fatura bem mas o dinheiro some no fim do mês — a Nortyx é para você. Atendemos profissionais autônomos, PJs e pequenas empresas de qualquer setor.
+            </p>
+          </div>
+          <div className="paraquem-grid">
+            <div className="pq-card featured rv">
+              <span className="pq-icon">⚖️</span>
+              <div className="pq-name">Advogados</div>
+              <div className="pq-desc">Controle de honorários, gestão de recebíveis e planejamento financeiro para escritórios de qualquer porte.</div>
+              <div className="pq-features">
+                <div className="pq-feat">Controle de honorários</div>
+                <div className="pq-feat">Redução de inadimplência</div>
+                <div className="pq-feat">DRE mensal</div>
+              </div>
+            </div>
+            <div className="pq-card featured rv">
+              <span className="pq-icon">🩺</span>
+              <div className="pq-name">Médicos e Clínicas</div>
+              <div className="pq-desc">Equilibrio financeiro, controle de recebíveis e visibilidade total do caixa para profissionais de saúde.</div>
+              <div className="pq-features">
+                <div className="pq-feat">Fluxo de caixa</div>
+                <div className="pq-feat">Controle de pacientes</div>
+                <div className="pq-feat">Planejamento de expansão</div>
+              </div>
+            </div>
+            <div className="pq-card featured rv">
+              <span className="pq-icon">📣</span>
+              <div className="pq-name">Agências</div>
+              <div className="pq-desc">Gestão financeira da agência, controle por cliente e previsibilidade para escalar com saúde.</div>
+              <div className="pq-features">
+                <div className="pq-feat">Receita por cliente</div>
+                <div className="pq-feat">Fluxo de caixa</div>
+                <div className="pq-feat">Metas de crescimento</div>
+              </div>
+            </div>
+            {[
+              { icon: "🦷", name: "Dentistas", desc: "Controle de parcelas de tratamentos e gestão financeira para clínicas odontológicas." },
+              { icon: "🔧", name: "Prestadores de Serviço", desc: "Contadores, arquitetos, consultores e qualquer PJ que quer clareza financeira." },
+              { icon: "🏋️", name: "Academias e Estúdios", desc: "Controle de mensalidades, custos e planejamento para negócios do setor fitness." },
+              { icon: "🏫", name: "Escolas e Cursos", desc: "Gestão de mensalidades, inadimplência e fluxo de caixa para o setor educacional." },
+              { icon: "💆", name: "Estética e Bem-estar", desc: "Controle financeiro para clínicas de estética, salões e profissionais de bem-estar." },
+            ].map((c) => (
+              <div key={c.name} className="pq-card rv">
+                <span className="pq-icon">{c.icon}</span>
+                <div className="pq-name">{c.name}</div>
+                <div className="pq-desc">{c.desc}</div>
+              </div>
+            ))}
+            <div className="pq-more rv">
+              <div style={{ fontSize: "1.5rem", marginBottom: 6 }}>+</div>
+              <div className="pq-more-text">Qualquer PJ ou<br />pequena empresa</div>
+            </div>
+          </div>
+          <p style={{ textAlign: "center", fontSize: ".82rem", color: "var(--lp-muted)", marginTop: 24 }} className="rv">
+            Não encontrou o seu segmento?{" "}
+            <a href={WHATSAPP_SEG} target="_blank" rel="noreferrer" style={{ color: "var(--navy)", fontWeight: 500 }}>
+              Fale com Estevão.
+            </a>
+          </p>
+        </div>
+      </section>
 
-@keyframes fadeToast {
-  from { opacity:0; transform:translateX(-50%) translateY(-8px); }
-  to   { opacity:1; transform:translateX(-50%) translateY(0); }
-}
+      {/* PROCESSO */}
+      <section id="processo" className="processo-bg">
+        <div className="section-inner">
+          <div className="processo-layout">
+            <div>
+              <div className="s-tag rv">Como funciona</div>
+              <h2 className="s-title rv">Do diagnóstico<br />ao resultado<br /><em>em 4 etapas.</em></h2>
+            </div>
+            <p className="s-sub rv">
+              Processo claro, sem burocracia. Você sabe exatamente o que acontece em cada etapa e quando vai ver os primeiros resultados.
+            </p>
+          </div>
+          <div className="steps">
+            {[
+              { n: "01", name: "Diagnóstico", desc: "Reunião inicial para mapear a situação financeira atual, identificar gargalos e entender os objetivos do negócio." },
+              { n: "02", name: "Plano", desc: "Apresentação do plano de ação personalizado com prioridades, metas e o que será feito em cada mês." },
+              { n: "03", name: "Execução", desc: "Implementação do controle financeiro, organização do fluxo de caixa e entrega dos relatórios mensais." },
+              { n: "04", name: "Acompanhamento", desc: "Reunião mensal para revisar resultados, ajustar metas e garantir que o negócio está no caminho certo." },
+            ].map((s) => (
+              <div key={s.n} className="step rv">
+                <div className="step-num">{s.n}</div>
+                <div className="step-name">{s.name}</div>
+                <div className="step-desc">{s.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-/* ── HERO CARROSSEL ── */
-.hero-carousel{position:relative;overflow:hidden}
-.hc-track{display:grid}
-.hc-slide{grid-area:1/1;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .7s ease,visibility .7s;transform:translateY(0)}
-.hc-slide.hc-active{opacity:1;visibility:visible;pointer-events:auto;z-index:1}
+      {/* PLANOS */}
+      <section id="planos" className="planos-bg">
+        <div className="section-inner">
+          <div className="plans-head">
+            <div>
+              <div className="s-tag rv">Planos e preços</div>
+              <h2 className="s-title rv">Invista na saúde<br />financeira do<br /><em>seu negócio.</em></h2>
+            </div>
+            <div>
+              <p className="s-sub rv">
+                Sem contratos longos, sem surpresas. Escolha o plano, preencha o formulário e entraremos em contato em até 24h.
+              </p>
+              <div className="billing-toggle rv">
+                <span className={`tgl-lbl ${!annual ? "on" : ""}`}>Mensal</span>
+                <label className="tgl">
+                  <input type="checkbox" checked={annual} onChange={(e) => setAnnual(e.target.checked)} />
+                  <div className="tgl-track" />
+                  <div className="tgl-thumb" />
+                </label>
+                <span className={`tgl-lbl ${annual ? "on" : ""}`}>
+                  Anual <span className="annual-badge">–20%</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="plans-grid">
+            {/* Essencial */}
+            <div className="plan rv">
+              <div className="plan-name">Essencial</div>
+              <div className="plan-tagline">Para organizar o financeiro e ter clareza do caixa.</div>
+              <div className="plan-price">{annual ? plans.essencial.a : plans.essencial.m}</div>
+              <div className="plan-period">{annual ? "/mês · cobrado anualmente" : "/mês · sem fidelidade"}</div>
+              {annual && <div className="plan-annual" style={{ display: "block" }}>Equivale a R$ 7.584/ano · economia de R$ 1.896</div>}
+              <div className="plan-sep" />
+              <div className="plan-feats">
+                <div className="plan-feat"><span className="feat-ok">✓</span>Diagnóstico financeiro inicial</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Controle de fluxo de caixa</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>DRE mensal simplificado</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Relatório mensal em PDF</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>1 reunião mensal (60 min)</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Suporte via WhatsApp</div>
+                <div className="plan-feat"><span className="feat-no">✗</span><span style={{ color: "var(--lp-muted)" }}>Planejamento anual</span></div>
+                <div className="plan-feat"><span className="feat-no">✗</span><span style={{ color: "var(--lp-muted)" }}>Análise de precificação</span></div>
+              </div>
+              <button
+                type="button"
+                className="plan-btn plan-btn-out"
+                onClick={() => openModal("Essencial", `${annual ? plans.essencial.a : plans.essencial.m}/mês`)}
+              >
+                Contratar agora
+              </button>
+            </div>
 
-.hc-arrow{
-  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
-  width:44px;height:44px;border-radius:50%;
-  background:rgba(255,255,255,.9);border:1px solid var(--lp-border);
-  color:var(--navy);font-size:1.5rem;line-height:1;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .25s;box-shadow:0 4px 16px rgba(26,36,84,.08);
-  font-family:inherit;padding:0 0 3px;
-}
-.hc-arrow:hover{background:var(--navy);color:var(--white);border-color:var(--navy)}
-.hc-prev{left:18px}
-.hc-next{right:18px}
+            {/* Profissional */}
+            <div className="plan hot rv">
+              <div className="plan-badge">MAIS POPULAR</div>
+              <div className="plan-name">Profissional</div>
+              <div className="plan-tagline">Para crescer com estratégia e controle real.</div>
+              <div className="plan-price">{annual ? plans.pro.a : plans.pro.m}</div>
+              <div className="plan-period">{annual ? "/mês · cobrado anualmente" : "/mês · sem fidelidade"}</div>
+              {annual && (
+                <div className="plan-annual" style={{ display: "block", color: "rgba(34,197,94,.8)" }}>
+                  Equivale a R$ 12.384/ano · economia de R$ 3.096
+                </div>
+              )}
+              <div className="plan-sep" />
+              <div className="plan-feats">
+                <div className="plan-feat"><span className="feat-ok">✓</span>Tudo do Essencial</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Planejamento financeiro anual</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Análise de precificação</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Controle de inadimplência</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>2 reuniões mensais (60 min cada)</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Metas e OKRs financeiros</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Suporte prioritário</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Dashboard financeiro compartilhado</div>
+              </div>
+              <button
+                type="button"
+                className="plan-btn plan-btn-fill"
+                onClick={() => openModal("Profissional", `${annual ? plans.pro.a : plans.pro.m}/mês`)}
+              >
+                Contratar agora
+              </button>
+            </div>
 
-.hc-dots{
-  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:5;
-  display:flex;gap:8px;align-items:center;
-  background:rgba(255,255,255,.85);backdrop-filter:blur(8px);
-  border:1px solid var(--lp-border);border-radius:100px;padding:6px 8px;
-  box-shadow:0 4px 16px rgba(26,36,84,.07);
-}
-.hc-dot{
-  border:none;background:transparent;cursor:pointer;
-  font-family:inherit;font-size:.7rem;font-weight:600;color:var(--lp-muted);
-  padding:6px 14px;border-radius:100px;transition:all .25s;letter-spacing:.03em;
-}
-.hc-dot:hover{color:var(--navy);background:var(--accentL)}
-.hc-dot.on{background:var(--navy);color:var(--white)}
+            {/* Premium */}
+            <div className="plan rv">
+              <div className="plan-name">Premium</div>
+              <div className="plan-tagline">Para quem quer um CFO dedicado ao negócio.</div>
+              <div className="plan-price">Consulta</div>
+              <div className="plan-period">Fale com Estevão para um orçamento</div>
+              <div className="plan-sep" />
+              <div className="plan-feats">
+                <div className="plan-feat"><span className="feat-ok">✓</span>Tudo do Profissional</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Gestão financeira completa</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Contas a pagar e receber</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Reuniões semanais</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Relatórios personalizados</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Atendimento presencial (SP)</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Suporte dedicado ilimitado</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Estratégia de crescimento</div>
+              </div>
+              <a href={WHATSAPP_PREMIUM} target="_blank" rel="noreferrer" className="plan-btn plan-btn-out">
+                Falar com Estevão
+              </a>
+            </div>
 
-/* ── BANNER 2 · mini-diagnóstico interativo ── */
-.hero-diag{background:linear-gradient(135deg,var(--cream) 0%,#eef0f9 100%)}
-.diag-mini{width:400px}
-.dm-q{font-size:.95rem;color:var(--ink);line-height:1.6;margin-bottom:20px;font-weight:400}
-.dm-score-row{display:flex;align-items:center;gap:18px;margin-bottom:18px}
-.dm-score{
-  font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:400;
-  color:var(--navy);line-height:1;min-width:52px;text-align:center;
-  background:var(--pale);border-radius:12px;padding:10px 6px;
-}
-.dm-range{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:100px;background:var(--lp-border);outline:none;cursor:pointer}
-.dm-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 2px 8px rgba(26,36,84,.3);cursor:grab}
-.dm-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 2px 8px rgba(26,36,84,.3);cursor:grab}
-.dm-msg{
-  font-size:.82rem;color:var(--gray);line-height:1.6;font-weight:300;
-  background:var(--pale);border-radius:10px;padding:14px 16px;margin-bottom:20px;
-  display:flex;gap:8px;align-items:flex-start;min-height:66px;
-}
+            {/* App Nortyx */}
+            <div className="plan app-plan rv" id="plano-app">
+              <div className="plan-badge app-plan-badge">SOMENTE O APP</div>
+              <div className="plan-name">App Nortyx</div>
+              <div className="plan-tagline">O aplicativo de gestão financeira da Nortyx — sem consultoria.</div>
+              <div className="plan-price">{APP_PLAN.mensal}</div>
+              <div className="plan-period">/mês · + setup inicial de {APP_PLAN.setup}</div>
+              <div className="plan-sep" />
+              <div className="plan-feats">
+                <div className="plan-feat"><span className="feat-ok">✓</span>Fluxo de caixa completo</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>DRE automático</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Contas a pagar e receber</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Controle de inadimplência e cobranças</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Metas e relatórios gerenciais</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Acesso no celular e no computador (PWA)</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Implantação e treinamento inclusos no setup</div>
+              </div>
+              <button
+                type="button"
+                className="plan-btn plan-btn-fill app-plan-btn"
+                onClick={() => openModal("App Nortyx", `${APP_PLAN.setup} de setup + ${APP_PLAN.mensal}/mês`)}
+              >
+                Adquirir o App →
+              </button>
+            </div>
+          </div>
+          <p className="plans-note rv">💳 PIX · Boleto · Cartão em até 12x &nbsp;·&nbsp; Sem fidelidade &nbsp;·&nbsp; Cancele quando quiser</p>
+        </div>
+      </section>
 
-/* ── BANNER 3 · App Nortyx ── */
-.hero-app{background:linear-gradient(160deg,var(--cream) 0%,#f0ede6 100%)}
-.hero-app .btn-primary{border:none;cursor:pointer;font-family:inherit}
+      {/* DEPOIMENTOS */}
+      <section id="depoimentos" className="dep-bg">
+        <div className="section-inner">
+          <div className="dep-layout">
+            <div>
+              <div className="s-tag rv">Clientes</div>
+              <h2 className="s-title rv">Resultados que<br /><em>falam por si.</em></h2>
+            </div>
+            <p className="s-sub rv">
+              Profissionais e pequenas empresas que transformaram suas finanças com a Nortyx.
+            </p>
+          </div>
+          <div className="dep-grid">
+            {[
+              { initials: "DR", name: "Dr. Rafael M.", role: "Advogado — SP", text: "Eu faturava bem mas nunca sobrava dinheiro. A Nortyx organizou todo o meu fluxo de caixa e em 2 meses eu já tinha clareza total sobre o que acontecia com o meu dinheiro." },
+              { initials: "DM", name: "Dra. Marina S.", role: "Médica — Clínica Particular", text: "A consultoria mensal com o Estevão mudou como eu vejo o financeiro da clínica. Hoje tenho DRE, fluxo de caixa e metas claras. Nunca tive tanto controle assim." },
+              { initials: "CA", name: "Carlos A.", role: "CEO — Agência de Marketing", text: "Minha agência crescia mas eu não sabia se estava lucrando de verdade. O Estevão montou o planejamento financeiro e hoje tomo decisões com base em números reais." },
+            ].map((d) => (
+              <div key={d.initials} className="dep rv">
+                <div className="dep-quote">"</div>
+                <p className="dep-text">{d.text}</p>
+                <div className="dep-author">
+                  <div className="dep-avatar">{d.initials}</div>
+                  <div>
+                    <div className="dep-stars">★★★★★</div>
+                    <div className="dep-name">{d.name}</div>
+                    <div className="dep-role">{d.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-/* ── PLANO APP NORTYX ── */
-.app-plan{background:var(--navy2)}
-.app-plan:hover{background:#161d45}
-.app-plan .plan-name{color:var(--white)}
-.app-plan .plan-tagline{color:rgba(255,255,255,.4)}
-.app-plan .plan-price{color:var(--white)}
-.app-plan .plan-period{color:rgba(255,255,255,.35)}
-.app-plan .plan-sep{background:rgba(255,255,255,.08)}
-.app-plan .plan-feat{color:rgba(255,255,255,.6)}
-.app-plan-badge{background:rgba(255,255,255,.14);color:rgba(255,255,255,.8)}
-.app-plan-btn{background:var(--white);color:var(--navy);border:none;cursor:pointer;width:100%;font-family:inherit}
-.app-plan-btn:hover{background:var(--cream)}
+      {/* DIAGNÓSTICO */}
+      <section id="diagnostico" className="diag-bg" style={{ padding: 0 }}>
+        <div className="diag-inner">
+          <div className="diag-left">
+            <div className="s-tag rv">Diagnóstico gratuito</div>
+            <h2 className="s-title rv">Descubra a saúde<br />financeira do seu<br /><em>negócio agora.</em></h2>
+            <p className="s-sub rv">
+              Responda 20 perguntas em menos de 5 minutos e receba um diagnóstico personalizado com seu score financeiro e o plano ideal para você.
+            </p>
+            <div className="diag-steps rv">
+              <div className="diag-step">
+                <div className="diag-step-num">01</div>
+                <div className="diag-step-text"><strong>Responda o questionário</strong>20 perguntas sobre finanças, controle e planejamento do seu negócio.</div>
+              </div>
+              <div className="diag-step">
+                <div className="diag-step-num">02</div>
+                <div className="diag-step-text"><strong>Receba seu score</strong>Resultado imediato com análise das 4 áreas financeiras do seu negócio.</div>
+              </div>
+              <div className="diag-step">
+                <div className="diag-step-num">03</div>
+                <div className="diag-step-text"><strong>Plano recomendado</strong>Com base no seu score, a Nortyx indica o melhor caminho para você.</div>
+              </div>
+            </div>
+          </div>
+          <div className="rv">
+            <div className="diag-card">
+              <div className="diag-card-tag">📊 Diagnóstico Financeiro — Nortyx</div>
+              <div className="diag-card-title">Teste gratuito<br />em 5 minutos</div>
+              <div className="diag-card-desc">
+                Descubra onde estão os gargalos financeiros do seu negócio e o que fazer para resolvê-los.
+              </div>
+              <div className="diag-features">
+                <div className="diag-feature"><div className="diag-feature-icon">✓</div>Score financeiro de 0 a 100</div>
+                <div className="diag-feature"><div className="diag-feature-icon">✓</div>Análise em 4 áreas: controle, inadimplência, planejamento e crescimento</div>
+                <div className="diag-feature"><div className="diag-feature-icon">✓</div>Recomendações personalizadas para o seu negócio</div>
+                <div className="diag-feature"><div className="diag-feature-icon">✓</div>100% gratuito e confidencial</div>
+              </div>
+              <a href="https://nortyxdiagnostico.lovable.app" target="_blank" rel="noreferrer" className="diag-cta">
+                Fazer diagnóstico gratuito →
+              </a>
+              <div className="diag-note">Leva menos de 5 minutos · Resultado imediato</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-@media(max-width:1060px){
-  .plans-grid{grid-template-columns:1fr}
-  .hc-arrow{display:none}
-  .hc-dots{bottom:14px}
-  .hc-dot{padding:6px 10px;font-size:.65rem}
-  .diag-mini{width:100%}
-  .hero-diag .hero-right,.hero-app .hero-right{display:none}
+      {/* CTA FINAL */}
+      <div className="cta-final">
+        <h2 className="s-title rv">Chega de não saber<br />o que sobra no<br /><em>fim do mês.</em></h2>
+        <p className="s-sub rv">
+          Agende uma conversa gratuita com Estevão e descubra como a Nortyx pode organizar as finanças do seu negócio.
+        </p>
+        <div className="cta-btns rv">
+          <a href={WHATSAPP_CTA} target="_blank" rel="noreferrer" className="cta-white">💬 Falar pelo WhatsApp</a>
+          <a href="mailto:Nortyx.group@gmail.com" className="cta-ghost-w">✉️ Enviar e-mail</a>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <footer>
+        <div className="footer-inner">
+          <div className="footer-top">
+            <div>
+              <a href="#" className="footer-logo">nortyx<span>.</span></a>
+              <p className="footer-tagline">
+                Consultoria financeira para profissionais autônomos e pequenas empresas.
+              </p>
+            </div>
+            <div>
+              <div className="footer-col-title">Navegação</div>
+              <div className="footer-links">
+                <a href="#servicos">Serviços</a>
+                <a href="#paraquem">Para quem</a>
+                <a href="#processo">Como funciona</a>
+                <a href="#planos">Planos</a>
+                <a href="#depoimentos">Clientes</a>
+                <a href="#diagnostico">Diagnóstico</a>
+              </div>
+            </div>
+            <div>
+              <div className="footer-col-title">Planos</div>
+              <div className="footer-links">
+                <a href="#planos" onClick={(e) => { e.preventDefault(); openModal("Essencial", `${annual ? plans.essencial.a : plans.essencial.m}/mês`); }}>Essencial</a>
+                <a href="#planos" onClick={(e) => { e.preventDefault(); openModal("Profissional", `${annual ? plans.pro.a : plans.pro.m}/mês`); }}>Profissional</a>
+                <a href={WHATSAPP_BASE} target="_blank" rel="noreferrer">Premium</a>
+                <a href="#plano-app" onClick={(e) => { e.preventDefault(); openModal("App Nortyx", `${APP_PLAN.setup} de setup + ${APP_PLAN.mensal}/mês`); }}>App Nortyx</a>
+              </div>
+            </div>
+            <div>
+              <div className="footer-col-title">Contato</div>
+              <div className="footer-contact">
+                <a href="mailto:Nortyx.group@gmail.com">Nortyx.group@gmail.com</a>
+                <a href="tel:+5516991776593">(16) 99177-6593</a>
+                <a href={WHATSAPP_BASE} target="_blank" rel="noreferrer" className="footer-wa">💬 WhatsApp direto</a>
+              </div>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <div className="footer-copy">© 2025 Nortyx. Todos os direitos reservados.</div>
+            <div className="footer-by">by Estevão Defendi</div>
+          </div>
+        </div>
+      </footer>
+
+      {/* MODAL */}
+      <div
+        className={`modal-ov ${modal.open ? "open" : ""}`}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) closeModal();
+        }}
+      >
+        <div className="modal-box">
+          <button className="modal-x" type="button" onClick={closeModal} aria-label="Fechar">×</button>
+          {!submitted ? (
+            <div>
+              <div className="modal-h">Contratar consultoria</div>
+              <div className="modal-sub">
+                Preencha seus dados e o Estevão entrará em contato em até 24h.
+              </div>
+              <div className="modal-plan-badge">
+                <span>{modal.planName}</span>
+                <span>·</span>
+                <span>{modal.planPrice}</span>
+              </div>
+              <form onSubmit={handleSubmit}>
+                <div className="fr2">
+                  <div className="fg">
+                    <label className="fl">Nome completo</label>
+                    <input className="fi" type="text" placeholder="Seu nome" required />
+                  </div>
+                  <div className="fg">
+                    <label className="fl">WhatsApp</label>
+                    <input className="fi" type="tel" placeholder="(16) 99999-9999" required />
+                  </div>
+                </div>
+                <div className="fg">
+                  <label className="fl">E-mail</label>
+                  <input className="fi" type="email" placeholder="seu@email.com" required />
+                </div>
+                <div className="fr2">
+                  <div className="fg">
+                    <label className="fl">Setor / profissão</label>
+                    <select className="fs" required defaultValue="">
+                      <option value="" disabled>Selecione...</option>
+                      <option>Advogado / Escritório</option>
+                      <option>Médico / Clínica</option>
+                      <option>Dentista</option>
+                      <option>Agência de Marketing</option>
+                      <option>Academia / Estúdio</option>
+                      <option>Escola / Curso</option>
+                      <option>Estética / Bem-estar</option>
+                      <option>Prestador de Serviços</option>
+                      <option>Outro</option>
+                    </select>
+                  </div>
+                  <div className="fg">
+                    <label className="fl">Faturamento mensal</label>
+                    <select className="fs" defaultValue="">
+                      <option value="" disabled>Selecione...</option>
+                      <option>Até R$ 10k</option>
+                      <option>R$ 10k – R$ 30k</option>
+                      <option>R$ 30k – R$ 80k</option>
+                      <option>Acima de R$ 80k</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="fg">
+                  <label className="fl">Qual é o seu maior desafio financeiro hoje?</label>
+                  <input className="fi" type="text" placeholder="Ex: não sei quanto sobra no fim do mês" />
+                </div>
+                <button type="submit" className="fsub">Quero organizar minhas finanças →</button>
+                <p className="fnote">🔒 Seus dados são confidenciais. Sem spam.</p>
+              </form>
+            </div>
+          ) : (
+            <div className="modal-ok" style={{ display: "block" }}>
+              <div className="modal-ok-ico">🎉</div>
+              <div className="modal-ok-h">Recebemos seu pedido!</div>
+              <p className="modal-ok-p">
+                Estevão vai entrar em contato pelo WhatsApp em até 24h para dar início à sua consultoria financeira.
+              </p>
+              <a href={WHATSAPP_OK} target="_blank" rel="noreferrer" className="modal-ok-btn">
+                💬 Falar agora no WhatsApp
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
