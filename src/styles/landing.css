@@ -224,35 +224,42 @@ section{padding:100px 60px}
 .tgl input:checked~.tgl-thumb{left:26px}
 .annual-badge{background:rgba(22,163,74,.1);color:var(--green);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
 
-.plans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--lp-border);border:1px solid var(--lp-border);border-radius:16px;overflow:hidden}
+.plans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;align-items:stretch}
 @media(max-width:1200px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
-.plan{background:var(--white);padding:34px 26px;position:relative;transition:background .2s}
-.plan:hover{background:var(--cream)}
-.plan.hot{background:var(--navy)}
-.plan.hot:hover{background:#243068}
-.plan-badge{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:.65rem;font-weight:700;padding:4px 10px;border-radius:100px;letter-spacing:.06em}
+.plan{
+  background:var(--white);padding:38px 30px;position:relative;
+  border:1px solid var(--lp-border);border-radius:16px;
+  display:flex;flex-direction:column;
+  transition:transform .25s,box-shadow .25s,border-color .25s;
+}
+.plan:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(26,36,84,.09);border-color:rgba(26,36,84,.15)}
+.plan.hot{background:var(--navy);border-color:var(--navy)}
+.plan.hot:hover{box-shadow:0 20px 48px rgba(26,36,84,.28)}
+.plan-badge{position:absolute;top:-13px;right:28px;background:var(--navy);color:var(--white);font-size:.65rem;font-weight:700;padding:6px 14px;border-radius:100px;letter-spacing:.06em;box-shadow:0 4px 12px rgba(26,36,84,.25)}
 .plan-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--ink);margin-bottom:6px;line-height:1}
 .plan.hot .plan-name{color:var(--white)}
-.plan-tagline{font-size:.8rem;color:var(--lp-muted);margin-bottom:24px;font-weight:300;line-height:1.5}
-.plan.hot .plan-tagline{color:rgba(255,255,255,.35)}
+.plan-tagline{font-size:.8rem;color:var(--lp-muted);margin-bottom:26px;font-weight:300;line-height:1.5;min-height:36px}
+.plan.hot .plan-tagline{color:rgba(255,255,255,.4)}
 .plan-price{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--ink);letter-spacing:-.02em;line-height:1;margin-bottom:4px}
 .plan.hot .plan-price{color:var(--white)}
-.plan-period{font-size:.75rem;color:var(--lp-muted);margin-bottom:24px}
-.plan.hot .plan-period{color:rgba(255,255,255,.3)}
+.plan-period{font-size:.75rem;color:var(--lp-muted);margin-bottom:26px}
+.plan.hot .plan-period{color:rgba(255,255,255,.35)}
 .plan-annual{display:none;font-size:.72rem;color:var(--green);margin-bottom:20px;font-weight:500}
-.plan-sep{height:1px;background:var(--lp-border);margin-bottom:22px}
-.plan.hot .plan-sep{background:rgba(255,255,255,.08)}
-.plan-feats{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
-.plan-feat{display:flex;align-items:flex-start;gap:9px;font-size:.82rem;color:var(--gray);font-weight:300}
-.plan.hot .plan-feat{color:rgba(255,255,255,.6)}
+.plan-sep{height:1px;background:var(--lp-border);margin-bottom:24px}
+.plan.hot .plan-sep{background:rgba(255,255,255,.1)}
+.plan-feats{display:flex;flex-direction:column;gap:13px;margin-bottom:30px;flex:1}
+.plan-feat{display:flex;align-items:flex-start;gap:9px;font-size:.82rem;color:var(--gray);font-weight:300;line-height:1.5}
+.plan.hot .plan-feat{color:rgba(255,255,255,.65)}
 .feat-ok{color:var(--green);flex-shrink:0;font-size:.85rem;margin-top:1px}
 .feat-no{color:var(--lp-border)}
-.plan-btn{display:block;text-align:center;padding:12px;border-radius:8px;font-weight:600;font-size:.875rem;text-decoration:none;transition:all .25s;font-family:'DM Sans',sans-serif}
-.plan-btn-out{border:1px solid rgba(26,36,84,.18);color:var(--navy)}
+.plan-btn{display:block;text-align:center;padding:13px;border-radius:9px;font-weight:600;font-size:.875rem;text-decoration:none;transition:all .25s;font-family:'DM Sans',sans-serif;margin-top:auto}
+.plan-btn-out{border:1.5px solid rgba(26,36,84,.18);color:var(--navy)}
 .plan-btn-out:hover{border-color:var(--navy);background:var(--accentL)}
 .plan-btn-fill{background:white;color:var(--navy)}
 .plan-btn-fill:hover{background:var(--cream)}
-.plans-note{text-align:center;font-size:.75rem;color:var(--lp-muted);margin-top:24px}
+.plans-note{text-align:center;font-size:.75rem;color:var(--lp-muted);margin-top:32px}
+
+@media(max-width:640px){.plans-grid{grid-template-columns:1fr}}
 
 /* ── DEPOIMENTOS ── */
 .dep-bg{background:var(--cream)}
@@ -517,15 +524,15 @@ footer{background:#060912;padding:52px 60px 32px}
 .hero-app .btn-primary{border:none;cursor:pointer;font-family:inherit}
 
 /* ── PLANO APP NORTYX ── */
-.app-plan{background:var(--navy2)}
-.app-plan:hover{background:#161d45}
+.app-plan{background:var(--navy2);border-color:var(--navy2)}
+.app-plan:hover{box-shadow:0 20px 48px rgba(15,21,53,.28)}
 .app-plan .plan-name{color:var(--white)}
 .app-plan .plan-tagline{color:rgba(255,255,255,.4)}
 .app-plan .plan-price{color:var(--white)}
 .app-plan .plan-period{color:rgba(255,255,255,.35)}
-.app-plan .plan-sep{background:rgba(255,255,255,.08)}
-.app-plan .plan-feat{color:rgba(255,255,255,.6)}
-.app-plan-badge{background:rgba(255,255,255,.14);color:rgba(255,255,255,.8)}
+.app-plan .plan-sep{background:rgba(255,255,255,.1)}
+.app-plan .plan-feat{color:rgba(255,255,255,.65)}
+.app-plan-badge{background:var(--navy2);color:rgba(255,255,255,.9);box-shadow:0 4px 12px rgba(15,21,53,.3)}
 .app-plan-btn{background:var(--white);color:var(--navy);border:none;cursor:pointer;width:100%;font-family:inherit}
 .app-plan-btn:hover{background:var(--cream)}
 
