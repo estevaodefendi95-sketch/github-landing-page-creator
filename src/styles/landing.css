@@ -580,6 +580,11 @@ footer{background:#060912;padding:52px 60px 32px}
 .app-plan-btn{background:var(--white);color:var(--navy);border:none;cursor:pointer;width:100%;font-family:inherit}
 .app-plan-btn:hover{background:var(--cream)}
 
+/* Variante clara (off-white) do card em destaque — usada no App Nortyx */
+.app-plan-light{background:var(--cream);border-color:var(--cream)}
+.app-plan-light:hover{box-shadow:0 16px 40px rgba(26,36,84,.1);border-color:rgba(26,36,84,.1)}
+.app-plan-light-badge{background:var(--navy);color:var(--white);box-shadow:0 4px 12px rgba(26,36,84,.25)}
+
 @media(max-width:1060px){
   .hc-arrow{display:none}
   .hc-dots{bottom:16px;padding:5px;gap:5px}
