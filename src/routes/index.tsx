@@ -55,6 +55,7 @@ type ModalState = { open: boolean; planName: string; planPrice: string };
 function LandingPage() {
   const [annual, setAnnual] = useState(false);
   const [navShadow, setNavShadow] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modal, setModal] = useState<ModalState>({ open: false, planName: "Profissional", planPrice: "R$ 1.290/mês" });
   const [submitted, setSubmitted] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -79,6 +80,11 @@ function LandingPage() {
       : diagVal <= 7
         ? { icon: "🟡", txt: "Você tem noção do caixa, mas ainda decide no escuro em parte do mês." }
         : { icon: "🟢", txt: "Ótimo ponto de partida! O diagnóstico mostra como ir além." };
+
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenuOpen]);
 
   function scrollToAppPlan() {
     document.getElementById("plano-app")?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -174,8 +180,34 @@ function LandingPage() {
         <div className="nav-right">
           <a href="#planos" className="nav-ghost">Ver planos</a>
           <a href={WHATSAPP_NAV} target="_blank" rel="noreferrer" className="nav-solid">💬 Falar agora</a>
+          <button
+            type="button"
+            className={`nav-burger ${mobileMenuOpen ? "open" : ""}`}
+            aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((v) => !v)}
+          >
+            <span /><span /><span />
+          </button>
         </div>
       </nav>
+
+      {/* MENU MOBILE */}
+      <div className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`}>
+        <ul className="mobile-menu-links">
+          <li><a href="#servicos" onClick={() => setMobileMenuOpen(false)}>Serviços</a></li>
+          <li><a href="#paraquem" onClick={() => setMobileMenuOpen(false)}>Para quem</a></li>
+          <li><a href="#processo" onClick={() => setMobileMenuOpen(false)}>Como funciona</a></li>
+          <li><a href="#planos" onClick={() => setMobileMenuOpen(false)}>Planos</a></li>
+          <li><a href="#depoimentos" onClick={() => setMobileMenuOpen(false)}>Clientes</a></li>
+          <li><a href="#diagnostico" onClick={() => setMobileMenuOpen(false)}>Diagnóstico</a></li>
+        </ul>
+        <div className="mobile-menu-ctas">
+          <a href="#planos" className="btn-secondary" onClick={() => setMobileMenuOpen(false)}>Ver planos →</a>
+          <a href={WHATSAPP_NAV} target="_blank" rel="noreferrer" className="btn-primary" onClick={() => setMobileMenuOpen(false)}>💬 Falar agora</a>
+        </div>
+      </div>
+      {mobileMenuOpen && <div className="mobile-menu-backdrop" onClick={() => setMobileMenuOpen(false)} />}
 
       {/* HERO — CARROSSEL COM 3 BANNERS */}
       <div
