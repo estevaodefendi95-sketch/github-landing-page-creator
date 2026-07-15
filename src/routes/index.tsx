@@ -1,6 +1,50 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import nortyxLogo from "@/assets/nortyx-logo.png.asset.json";
+import { supabase } from "@/lib/supabase-client";
+
+/* ════════════════════════════════════════════════════════════════
+   ⚠️  SENHA DO MODO DE EDIÇÃO — EDITE AQUI SE QUISER TROCAR  ⚠️
+   ════════════════════════════════════════════════════════════════ */
+const EDIT_PASSWORD = "147896325";
+
+type BannerContent = {
+  eyebrow: string;
+  titleLines: string[];
+  titleLastPrefix: string;
+  titleLastEm: string;
+  desc: string;
+};
+
+type SiteContent = {
+  banner1: BannerContent;
+  banner2: BannerContent;
+  banner3: BannerContent;
+};
+
+const DEFAULT_CONTENT: SiteContent = {
+  banner1: {
+    eyebrow: "Consultoria Financeira",
+    titleLines: ["Organização", "financeira para", "quem trabalha"],
+    titleLastPrefix: "por ",
+    titleLastEm: "conta própria.",
+    desc: "Fluxo de caixa, DRE, planejamento e controle de inadimplência. Tudo o que o seu negócio precisa para crescer com previsibilidade — sem surpresas no fim do mês.",
+  },
+  banner2: {
+    eyebrow: "Diagnóstico gratuito · 5 minutos",
+    titleLines: ["Descubra a saúde", "financeira do seu"],
+    titleLastPrefix: "",
+    titleLastEm: "negócio agora.",
+    desc: "Responda 20 perguntas rápidas e receba na hora seu score financeiro de 0 a 100, com análise de controle, inadimplência, planejamento e crescimento.",
+  },
+  banner3: {
+    eyebrow: "App Nortyx · Gestão financeira",
+    titleLines: ["Todo o seu financeiro"],
+    titleLastPrefix: "em um único ",
+    titleLastEm: "aplicativo.",
+    desc: "Fluxo de caixa, DRE automático, contas a pagar e receber, cobranças e metas — direto do celular ou computador. Adquira somente o app, com implantação inclusa.",
+  },
+};
 
 const WHATSAPP_BASE = "https://wa.me/5516991776593";
 const WHATSAPP_HERO = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero uma consultoria financeira!")}`;
@@ -59,6 +103,10 @@ function LandingPage() {
   const [modal, setModal] = useState<ModalState>({ open: false, planName: "Profissional", planPrice: "R$ 1.290/mês" });
   const [submitted, setSubmitted] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const editModeRef = useRef(false);
+  useEffect(() => { editModeRef.current = editMode; }, [editMode]);
+  const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   // ── Carrossel do hero (3 banners) ──
   const [hcSlide, setHcSlide] = useState(0);
@@ -113,7 +161,11 @@ function LandingPage() {
       if (e.key === "Escape") closeModal();
       if (e.ctrlKey && e.shiftKey && (e.key === "E" || e.key === "e")) {
         e.preventDefault();
-        setEditMode((v) => !v);
+        if (editModeRef.current) {
+          setEditMode(false);
+        } else {
+          tryEnableEditMode();
+        }
       }
     };
     window.addEventListener("keydown", onKey);
@@ -133,6 +185,48 @@ function LandingPage() {
     };
   }, [modal.open]);
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("site_content")
+        .select("content")
+        .eq("id", "homepage")
+        .maybeSingle();
+      if (!cancelled && !error && data?.content) {
+        const saved = data.content as Partial<SiteContent>;
+        setContent({
+          banner1: { ...DEFAULT_CONTENT.banner1, ...saved.banner1 },
+          banner2: { ...DEFAULT_CONTENT.banner2, ...saved.banner2 },
+          banner3: { ...DEFAULT_CONTENT.banner3, ...saved.banner3 },
+        });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  function updateBannerField(banner: keyof SiteContent, field: keyof BannerContent, value: string | string[]) {
+    setContent((c) => ({ ...c, [banner]: { ...c[banner], [field]: value } }));
+  }
+
+  async function saveContent() {
+    setSaveStatus("saving");
+    const { error } = await supabase
+      .from("site_content")
+      .upsert({ id: "homepage", content, updated_at: new Date().toISOString() });
+    setSaveStatus(error ? "error" : "saved");
+    if (!error) setTimeout(() => setSaveStatus("idle"), 2500);
+  }
+
+  function tryEnableEditMode() {
+    const pwd = window.prompt("Senha para editar o site:");
+    if (pwd === null) return;
+    if (pwd === EDIT_PASSWORD) {
+      setEditMode(true);
+    } else {
+      window.alert("Senha incorreta.");
+    }
+  }
   function openModal(planName: string, planPrice: string) {
     setSubmitted(false);
     setModal({ open: true, planName, planPrice });
@@ -145,20 +239,91 @@ function LandingPage() {
     setSubmitted(true);
   }
 
+  function renderBannerHeader(key: keyof SiteContent) {
+    const b = content[key];
+    const editableStyle = editMode ? { outline: "1.5px dashed rgba(26,36,84,.35)", outlineOffset: 2, borderRadius: 3 } : undefined;
+    return (
+      <>
+        <div
+          className="hero-eyebrow"
+          contentEditable={editMode}
+          suppressContentEditableWarning
+          style={editableStyle}
+          onBlur={(e) => updateBannerField(key, "eyebrow", e.currentTarget.textContent || "")}
+        >
+          {b.eyebrow}
+        </div>
+        <h1>
+          {b.titleLines.map((line, i) => (
+            <span key={i}>
+              <span
+                contentEditable={editMode}
+                suppressContentEditableWarning
+                style={editableStyle}
+                onBlur={(e) => {
+                  const lines = [...b.titleLines];
+                  lines[i] = e.currentTarget.textContent || "";
+                  updateBannerField(key, "titleLines", lines);
+                }}
+              >
+                {line}
+              </span>
+              <br />
+            </span>
+          ))}
+          <span
+            contentEditable={editMode}
+            suppressContentEditableWarning
+            style={editableStyle}
+            onBlur={(e) => updateBannerField(key, "titleLastPrefix", e.currentTarget.textContent || "")}
+          >
+            {b.titleLastPrefix}
+          </span>
+          <em
+            contentEditable={editMode}
+            suppressContentEditableWarning
+            style={editableStyle}
+            onBlur={(e) => updateBannerField(key, "titleLastEm", e.currentTarget.textContent || "")}
+          >
+            {b.titleLastEm}
+          </em>
+        </h1>
+        <p
+          className="hero-desc"
+          contentEditable={editMode}
+          suppressContentEditableWarning
+          style={editableStyle}
+          onBlur={(e) => updateBannerField(key, "desc", e.currentTarget.textContent || "")}
+        >
+          {b.desc}
+        </p>
+      </>
+    );
+  }
+
   const plans = {
     essencial: { m: "R$ 790", a: "R$ 632" },
     pro: { m: "R$ 1.290", a: "R$ 1.032" },
   } as const;
 
   return (
-    <div
-      contentEditable={editMode}
-      suppressContentEditableWarning
-      style={editMode ? { outline: "2px dashed #1a2454", outlineOffset: -4 } : undefined}
-    >
+    <div>
       {editMode && (
-        <div style={{ position: "fixed", top: 12, right: 12, zIndex: 9999, background: "#1a2454", color: "#fff", padding: "8px 14px", borderRadius: 999, fontSize: 13, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(0,0,0,.2)" }}>
-          ✏️ Modo edição ativo — Ctrl+Shift+E para sair
+        <div style={{ position: "fixed", top: 12, right: 12, zIndex: 9999, display: "flex", alignItems: "center", gap: 10, background: "#1a2454", color: "#fff", padding: "8px 10px 8px 16px", borderRadius: 999, fontSize: 13, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(0,0,0,.2)" }}>
+          <span>✏️ Editando os 3 banners — Ctrl+Shift+E para sair</span>
+          <button
+            type="button"
+            onClick={saveContent}
+            disabled={saveStatus === "saving"}
+            style={{
+              background: saveStatus === "saved" ? "#16a34a" : "#fff",
+              color: saveStatus === "saved" ? "#fff" : "#1a2454",
+              border: "none", borderRadius: 999, padding: "6px 16px",
+              fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            {saveStatus === "saving" ? "Salvando…" : saveStatus === "saved" ? "Salvo ✓" : saveStatus === "error" ? "Erro, tentar de novo" : "Salvar"}
+          </button>
         </div>
       )}
       {/* NAV */}
@@ -220,13 +385,7 @@ function LandingPage() {
         {/* ── BANNER 1 · Consultoria (original, sem alterações) ── */}
         <section className={`hero hc-slide ${hcSlide === 0 ? "hc-active" : ""}`}>
         <div className="hero-left">
-          <div className="hero-eyebrow">Consultoria Financeira</div>
-          <h1>
-            Organização<br />financeira para<br />quem trabalha<br />por <em>conta própria.</em>
-          </h1>
-          <p className="hero-desc">
-            Fluxo de caixa, DRE, planejamento e controle de inadimplência. Tudo o que o seu negócio precisa para crescer com previsibilidade — sem surpresas no fim do mês.
-          </p>
+          {renderBannerHeader("banner1")}
           <div className="hero-ctas">
             <a href={WHATSAPP_HERO} target="_blank" rel="noreferrer" className="btn-primary">💬 Falar pelo WhatsApp</a>
             <a href="#planos" className="btn-secondary">Ver planos →</a>
@@ -304,13 +463,7 @@ function LandingPage() {
         {/* ── BANNER 2 · Diagnóstico interativo ── */}
         <section className={`hero hero-diag hc-slide ${hcSlide === 1 ? "hc-active" : ""}`}>
           <div className="hero-left">
-            <div className="hero-eyebrow">Diagnóstico gratuito · 5 minutos</div>
-            <h1>
-              Descubra a saúde<br />financeira do seu<br /><em>negócio agora.</em>
-            </h1>
-            <p className="hero-desc">
-              Responda 20 perguntas rápidas e receba na hora seu score financeiro de 0 a 100, com análise de controle, inadimplência, planejamento e crescimento.
-            </p>
+            {renderBannerHeader("banner2")}
             <div className="hero-ctas">
               <a href={DIAGNOSTICO_URL} target="_blank" rel="noreferrer" className="btn-primary">📊 Fazer diagnóstico gratuito</a>
               <a href="#diagnostico" className="btn-secondary">Saber mais →</a>
@@ -367,13 +520,7 @@ function LandingPage() {
         {/* ── BANNER 3 · App Nortyx ── */}
         <section className={`hero hero-app hc-slide ${hcSlide === 2 ? "hc-active" : ""}`}>
           <div className="hero-left">
-            <div className="hero-eyebrow">App Nortyx · Gestão financeira</div>
-            <h1>
-              Todo o seu financeiro<br />em um único <em>aplicativo.</em>
-            </h1>
-            <p className="hero-desc">
-              Fluxo de caixa, DRE automático, contas a pagar e receber, cobranças e metas — direto do celular ou computador. Adquira somente o app, com implantação inclusa.
-            </p>
+            {renderBannerHeader("banner3")}
             <div className="hero-ctas">
               <button type="button" onClick={scrollToAppPlan} className="btn-primary">
                 💻 Quero o App Nortyx →
