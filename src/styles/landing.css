@@ -654,6 +654,7 @@ footer{background:#060912;padding:52px 60px 32px}
     padding:80px 22px 58px;
     display:flex;flex-direction:column;
     justify-content:flex-start;align-items:stretch;
+    justify-content:safe center;
   }
   .hero.hc-slide .hero-left{max-width:none}
   .hero.hc-slide .hero-eyebrow{font-size:.66rem;margin-bottom:10px}
