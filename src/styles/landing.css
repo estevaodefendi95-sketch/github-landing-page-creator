@@ -565,6 +565,7 @@ footer{background:#060912;padding:52px 60px 32px}
 
 /* ── BANNER 3 · App Nortyx ── */
 .hero-app{background:linear-gradient(160deg,var(--cream) 0%,#f0ede6 100%)}
+.hero-custom{background:linear-gradient(150deg,#eef0f9 0%,var(--cream) 100%)}
 .hero-app .btn-primary{border:none;cursor:pointer;font-family:inherit}
 
 /* ── PLANO APP NORTYX ── */
@@ -592,7 +593,7 @@ footer{background:#060912;padding:52px 60px 32px}
   .hc-dot.on{width:22px;border-radius:100px}
   .hc-dot-label{display:none}
   .diag-mini{width:100%}
-  .hero-diag .hero-right,.hero-app .hero-right{display:none}
+  .hero-diag .hero-right,.hero-app .hero-right,.hero-custom .hero-right{display:none}
 }
 
 /* ── ENQUADRAMENTO 100vh — banners cabem na primeira dobra, sem scroll ── */
