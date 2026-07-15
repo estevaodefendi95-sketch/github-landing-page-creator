@@ -6,7 +6,7 @@ const WHATSAPP_BASE = "https://wa.me/5516991776593";
 const WHATSAPP_HERO = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero uma consultoria financeira!")}`;
 const WHATSAPP_NAV = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, vim pelo site da Nortyx!")}`;
 const WHATSAPP_SEG = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero saber se a Nortyx atende meu setor!")}`;
-const WHATSAPP_PREMIUM = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, tenho interesse no plano Premium!")}`;
+const WHATSAPP_CUSTOM = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, tenho interesse em um App Personalizado!")}`;
 const WHATSAPP_CTA = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero organizar as finanças do meu negócio!")}`;
 const WHATSAPP_OK = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, acabei de preencher o formulário da Nortyx!")}`;
 
@@ -711,28 +711,6 @@ function LandingPage() {
               </button>
             </div>
 
-            {/* Premium */}
-            <div className="plan rv">
-              <div className="plan-name">Premium</div>
-              <div className="plan-tagline">Para quem quer um CFO dedicado ao negócio.</div>
-              <div className="plan-price">Consulta</div>
-              <div className="plan-period">Fale com Estevão para um orçamento</div>
-              <div className="plan-sep" />
-              <div className="plan-feats">
-                <div className="plan-feat"><span className="feat-ok">✓</span>Tudo do Profissional</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Gestão financeira completa</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Contas a pagar e receber</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Reuniões semanais</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Relatórios personalizados</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Atendimento presencial (SP)</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Suporte dedicado ilimitado</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Estratégia de crescimento</div>
-              </div>
-              <a href={WHATSAPP_PREMIUM} target="_blank" rel="noreferrer" className="plan-btn plan-btn-out">
-                Falar com Estevão
-              </a>
-            </div>
-
             {/* App Nortyx */}
             <div className="plan app-plan rv" id="plano-app">
               <div className="plan-badge app-plan-badge">SOMENTE O APP</div>
@@ -757,6 +735,27 @@ function LandingPage() {
               >
                 Adquirir o App →
               </button>
+            </div>
+
+            {/* App Personalizado */}
+            <div className="plan rv">
+              <div className="plan-name">App Personalizado</div>
+              <div className="plan-tagline">Um aplicativo próprio, feito sob medida para a sua operação.</div>
+              <div className="plan-price">Consulta</div>
+              <div className="plan-period">Fale com Estevão para um orçamento</div>
+              <div className="plan-sep" />
+              <div className="plan-feats">
+                <div className="plan-feat"><span className="feat-ok">✓</span>Levantamento completo do seu processo</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Desenvolvimento 100% sob medida</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Telas e fluxos exclusivos para o seu negócio</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Integração com sistemas que você já usa</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Treinamento da sua equipe</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Suporte e manutenção contínua</div>
+                <div className="plan-feat"><span className="feat-ok">✓</span>Evolui junto com o seu negócio</div>
+              </div>
+              <a href={WHATSAPP_CUSTOM} target="_blank" rel="noreferrer" className="plan-btn plan-btn-out">
+                Falar com Estevão
+              </a>
             </div>
           </div>
           <p className="plans-note rv">💳 PIX · Boleto · Cartão em até 12x &nbsp;·&nbsp; Sem fidelidade &nbsp;·&nbsp; Cancele quando quiser</p>
@@ -882,8 +881,8 @@ function LandingPage() {
               <div className="footer-links">
                 <a href="#planos" onClick={(e) => { e.preventDefault(); openModal("Essencial", `${annual ? plans.essencial.a : plans.essencial.m}/mês`); }}>Essencial</a>
                 <a href="#planos" onClick={(e) => { e.preventDefault(); openModal("Profissional", `${annual ? plans.pro.a : plans.pro.m}/mês`); }}>Profissional</a>
-                <a href={WHATSAPP_BASE} target="_blank" rel="noreferrer">Premium</a>
                 <a href="#plano-app" onClick={(e) => { e.preventDefault(); openModal("App Nortyx", `${APP_PLAN.setup} de setup + ${APP_PLAN.mensal}/mês`); }}>App Nortyx</a>
+                <a href={WHATSAPP_CUSTOM} target="_blank" rel="noreferrer">App Personalizado</a>
               </div>
             </div>
             <div>
