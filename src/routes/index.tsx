@@ -19,6 +19,7 @@ type BannerContent = {
 type CardText = { name: string; desc: string };
 type Testimonial = { text: string; name: string; role: string };
 type DiagCard = { tag: string; titleLines: string[]; desc: string; note: string };
+type PlanText = { name: string; tagline: string; features: string[] };
 
 type SiteContent = {
   banner1: BannerContent;
@@ -38,6 +39,12 @@ type SiteContent = {
   steps: CardText[];
   testimonials: Testimonial[];
   diagCard: DiagCard;
+  plans: {
+    essencial: PlanText;
+    profissional: PlanText;
+    appNortyx: PlanText;
+    appPersonalizado: PlanText;
+  };
   footerTagline: string;
 };
 
@@ -106,6 +113,28 @@ const DEFAULT_CONTENT: SiteContent = {
     titleLines: ["Teste gratuito", "em 5 minutos"],
     desc: "Descubra onde estão os gargalos financeiros do seu negócio e o que fazer para resolvê-los.",
     note: "Leva menos de 5 minutos · Resultado imediato",
+  },
+  plans: {
+    essencial: {
+      name: "Essencial",
+      tagline: "Para organizar o financeiro e ter clareza do caixa.",
+      features: ["Diagnóstico financeiro inicial", "Controle de fluxo de caixa", "DRE mensal simplificado", "Relatório mensal em PDF", "1 reunião mensal (60 min)", "Suporte via WhatsApp"],
+    },
+    profissional: {
+      name: "Profissional",
+      tagline: "Para crescer com estratégia e controle real.",
+      features: ["Tudo do Essencial", "Planejamento financeiro anual", "Análise de precificação", "Controle de inadimplência", "2 reuniões mensais (60 min cada)", "Metas e OKRs financeiros", "Suporte prioritário", "Dashboard financeiro compartilhado"],
+    },
+    appNortyx: {
+      name: "App Nortyx",
+      tagline: "O aplicativo de gestão financeira da Nortyx — sem consultoria.",
+      features: ["Fluxo de caixa completo", "DRE automático", "Contas a pagar e receber", "Controle de inadimplência e cobranças", "Metas e relatórios gerenciais", "Acesso no celular e no computador (PWA)", "Implantação e treinamento inclusos no setup"],
+    },
+    appPersonalizado: {
+      name: "App Personalizado",
+      tagline: "Um aplicativo próprio, feito sob medida para a sua operação.",
+      features: ["Levantamento completo do seu processo", "Desenvolvimento 100% sob medida", "Telas e fluxos exclusivos para o seu negócio", "Integração com sistemas que você já usa", "Treinamento da sua equipe", "Suporte e manutenção contínua", "Evolui junto com o seu negócio"],
+    },
   },
   footerTagline: "Consultoria financeira para profissionais autônomos e pequenas empresas.",
 };
@@ -277,6 +306,12 @@ function LandingPage() {
           steps: saved.steps && saved.steps.length === c.steps.length ? saved.steps : c.steps,
           testimonials: saved.testimonials && saved.testimonials.length === c.testimonials.length ? saved.testimonials : c.testimonials,
           diagCard: { ...c.diagCard, ...saved.diagCard },
+          plans: {
+            essencial: { ...c.plans.essencial, ...saved.plans?.essencial, features: saved.plans?.essencial?.features?.length === c.plans.essencial.features.length ? saved.plans.essencial.features : c.plans.essencial.features },
+            profissional: { ...c.plans.profissional, ...saved.plans?.profissional, features: saved.plans?.profissional?.features?.length === c.plans.profissional.features.length ? saved.plans.profissional.features : c.plans.profissional.features },
+            appNortyx: { ...c.plans.appNortyx, ...saved.plans?.appNortyx, features: saved.plans?.appNortyx?.features?.length === c.plans.appNortyx.features.length ? saved.plans.appNortyx.features : c.plans.appNortyx.features },
+            appPersonalizado: { ...c.plans.appPersonalizado, ...saved.plans?.appPersonalizado, features: saved.plans?.appPersonalizado?.features?.length === c.plans.appPersonalizado.features.length ? saved.plans.appPersonalizado.features : c.plans.appPersonalizado.features },
+          },
           footerTagline: saved.footerTagline ?? c.footerTagline,
         }));
       }
@@ -310,6 +345,18 @@ function LandingPage() {
 
   function updateDiagCard(field: keyof DiagCard, value: string | string[]) {
     setContent((c) => ({ ...c, diagCard: { ...c.diagCard, [field]: value } }));
+  }
+
+  function updatePlanField(plan: keyof SiteContent["plans"], field: "name" | "tagline", value: string) {
+    setContent((c) => ({ ...c, plans: { ...c.plans, [plan]: { ...c.plans[plan], [field]: value } } }));
+  }
+
+  function updatePlanFeature(plan: keyof SiteContent["plans"], index: number, value: string) {
+    setContent((c) => {
+      const features = [...c.plans[plan].features];
+      features[index] = value;
+      return { ...c, plans: { ...c.plans, [plan]: { ...c.plans[plan], features } } };
+    });
   }
 
   async function saveContent() {
@@ -490,6 +537,53 @@ function LandingPage() {
           {item.desc}
         </div>
       </>
+    );
+  }
+
+  function renderPlanNameTagline(plan: keyof SiteContent["plans"]) {
+    const p = content.plans[plan];
+    return (
+      <>
+        <div
+          className="plan-name"
+          contentEditable={editMode}
+          suppressContentEditableWarning
+          style={editableStyle}
+          onBlur={(e) => updatePlanField(plan, "name", e.currentTarget.textContent || "")}
+        >
+          {p.name}
+        </div>
+        <div
+          className="plan-tagline"
+          contentEditable={editMode}
+          suppressContentEditableWarning
+          style={editableStyle}
+          onBlur={(e) => updatePlanField(plan, "tagline", e.currentTarget.textContent || "")}
+        >
+          {p.tagline}
+        </div>
+      </>
+    );
+  }
+
+  function renderPlanFeatures(plan: keyof SiteContent["plans"]) {
+    const p = content.plans[plan];
+    return (
+      <div className="plan-feats">
+        {p.features.map((f, i) => (
+          <div key={i} className="plan-feat">
+            <span className="feat-ok">✓</span>
+            <span
+              contentEditable={editMode}
+              suppressContentEditableWarning
+              style={editableStyle}
+              onBlur={(e) => updatePlanFeature(plan, i, e.currentTarget.textContent || "")}
+            >
+              {f}
+            </span>
+          </div>
+        ))}
+      </div>
     );
   }
 
@@ -963,19 +1057,13 @@ function LandingPage() {
           <div className="plans-grid">
             {/* Essencial */}
             <div className="plan rv">
-              <div className="plan-name">Essencial</div>
-              <div className="plan-tagline">Para organizar o financeiro e ter clareza do caixa.</div>
+              {renderPlanNameTagline("essencial")}
               <div className="plan-price">{annual ? plans.essencial.a : plans.essencial.m}</div>
               <div className="plan-period">{annual ? "/mês · cobrado anualmente" : "/mês · sem fidelidade"}</div>
               {annual && <div className="plan-annual" style={{ display: "block" }}>Equivale a R$ 7.584/ano · economia de R$ 1.896</div>}
               <div className="plan-sep" />
-              <div className="plan-feats">
-                <div className="plan-feat"><span className="feat-ok">✓</span>Diagnóstico financeiro inicial</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Controle de fluxo de caixa</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>DRE mensal simplificado</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Relatório mensal em PDF</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>1 reunião mensal (60 min)</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Suporte via WhatsApp</div>
+              {renderPlanFeatures("essencial")}
+              <div className="plan-feats" style={{ marginTop: -10 }}>
                 <div className="plan-feat"><span className="feat-no">✗</span><span style={{ color: "var(--lp-muted)" }}>Planejamento anual</span></div>
                 <div className="plan-feat"><span className="feat-no">✗</span><span style={{ color: "var(--lp-muted)" }}>Análise de precificação</span></div>
               </div>
@@ -991,8 +1079,7 @@ function LandingPage() {
             {/* Profissional */}
             <div className="plan hot rv">
               <div className="plan-badge">MAIS POPULAR</div>
-              <div className="plan-name">Profissional</div>
-              <div className="plan-tagline">Para crescer com estratégia e controle real.</div>
+              {renderPlanNameTagline("profissional")}
               <div className="plan-price">{annual ? plans.pro.a : plans.pro.m}</div>
               <div className="plan-period">{annual ? "/mês · cobrado anualmente" : "/mês · sem fidelidade"}</div>
               {annual && (
@@ -1001,16 +1088,7 @@ function LandingPage() {
                 </div>
               )}
               <div className="plan-sep" />
-              <div className="plan-feats">
-                <div className="plan-feat"><span className="feat-ok">✓</span>Tudo do Essencial</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Planejamento financeiro anual</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Análise de precificação</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Controle de inadimplência</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>2 reuniões mensais (60 min cada)</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Metas e OKRs financeiros</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Suporte prioritário</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Dashboard financeiro compartilhado</div>
-              </div>
+              {renderPlanFeatures("profissional")}
               <button
                 type="button"
                 className="plan-btn plan-btn-fill"
@@ -1021,25 +1099,16 @@ function LandingPage() {
             </div>
 
             {/* App Nortyx */}
-            <div className="plan app-plan rv" id="plano-app">
-              <div className="plan-badge app-plan-badge">SOMENTE O APP</div>
-              <div className="plan-name">App Nortyx</div>
-              <div className="plan-tagline">O aplicativo de gestão financeira da Nortyx — sem consultoria.</div>
+            <div className="plan app-plan-light rv" id="plano-app">
+              <div className="plan-badge app-plan-light-badge">SOMENTE O APP</div>
+              {renderPlanNameTagline("appNortyx")}
               <div className="plan-price">{APP_PLAN.mensal}</div>
               <div className="plan-period">/mês · + setup inicial de {APP_PLAN.setup}</div>
               <div className="plan-sep" />
-              <div className="plan-feats">
-                <div className="plan-feat"><span className="feat-ok">✓</span>Fluxo de caixa completo</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>DRE automático</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Contas a pagar e receber</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Controle de inadimplência e cobranças</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Metas e relatórios gerenciais</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Acesso no celular e no computador (PWA)</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Implantação e treinamento inclusos no setup</div>
-              </div>
+              {renderPlanFeatures("appNortyx")}
               <button
                 type="button"
-                className="plan-btn plan-btn-fill app-plan-btn"
+                className="plan-btn plan-btn-out"
                 onClick={() => openModal("App Nortyx", `${APP_PLAN.setup} de setup + ${APP_PLAN.mensal}/mês`)}
               >
                 Adquirir o App →
@@ -1047,22 +1116,13 @@ function LandingPage() {
             </div>
 
             {/* App Personalizado */}
-            <div className="plan rv">
-              <div className="plan-name">App Personalizado</div>
-              <div className="plan-tagline">Um aplicativo próprio, feito sob medida para a sua operação.</div>
+            <div className="plan app-plan rv">
+              {renderPlanNameTagline("appPersonalizado")}
               <div className="plan-price">Consulta</div>
               <div className="plan-period">Fale com Estevão para um orçamento</div>
               <div className="plan-sep" />
-              <div className="plan-feats">
-                <div className="plan-feat"><span className="feat-ok">✓</span>Levantamento completo do seu processo</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Desenvolvimento 100% sob medida</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Telas e fluxos exclusivos para o seu negócio</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Integração com sistemas que você já usa</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Treinamento da sua equipe</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Suporte e manutenção contínua</div>
-                <div className="plan-feat"><span className="feat-ok">✓</span>Evolui junto com o seu negócio</div>
-              </div>
-              <a href={WHATSAPP_CUSTOM} target="_blank" rel="noreferrer" className="plan-btn plan-btn-out">
+              {renderPlanFeatures("appPersonalizado")}
+              <a href={WHATSAPP_CUSTOM} target="_blank" rel="noreferrer" className="plan-btn plan-btn-fill app-plan-btn">
                 Falar com Estevão
               </a>
             </div>
