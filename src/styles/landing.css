@@ -30,6 +30,33 @@ nav{
 .nav-solid{font-size:.85rem;font-weight:600;color:var(--white);background:var(--navy);text-decoration:none;padding:9px 20px;border-radius:7px;transition:all .2s}
 .nav-solid:hover{background:#243068}
 
+/* ── HAMBÚRGUER + MENU MOBILE ── */
+.nav-burger{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:38px;height:38px;border:none;background:transparent;cursor:pointer;
+  padding:0;margin-left:2px;flex-shrink:0;
+}
+.nav-burger span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px;transition:transform .25s,opacity .25s}
+.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-burger.open span:nth-child(2){opacity:0}
+.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+.mobile-menu{
+  position:fixed;top:68px;left:0;right:0;z-index:199;
+  background:var(--white);border-bottom:1px solid var(--lp-border);
+  box-shadow:0 16px 32px rgba(10,10,10,.08);
+  max-height:0;overflow:hidden;
+  transition:max-height .35s ease;
+}
+.mobile-menu.open{max-height:calc(100dvh - 68px);overflow-y:auto}
+.mobile-menu-links{list-style:none;padding:8px 24px;display:flex;flex-direction:column}
+.mobile-menu-links a{display:block;padding:15px 4px;font-size:1rem;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--lp-border);font-weight:500}
+.mobile-menu-links li:last-child a{border-bottom:none}
+.mobile-menu-ctas{display:flex;flex-direction:column;gap:10px;padding:16px 24px 28px}
+.mobile-menu-ctas a{text-align:center;justify-content:center}
+.mobile-menu-backdrop{position:fixed;inset:0;top:68px;background:rgba(10,10,10,.35);z-index:198}
+@media(min-width:1061px){.mobile-menu,.mobile-menu-backdrop{display:none !important}}
+
 /* ── HERO ── */
 .hero{
   min-height:100vh;
@@ -339,26 +366,43 @@ footer{background:#060912;padding:52px 60px 32px}
 
 /* ── RESPONSIVE ── */
 @media(max-width:1060px){
-  nav{padding:0 28px}
+  nav{padding:0 20px}
   .nav-links{display:none}
+  .nav-ghost{display:none}
+  .nav-burger{display:flex}
+  .nav-brand img{height:56px !important}
   .hero{grid-template-columns:1fr;padding:110px 28px 64px}
   .hero-right{display:none}
-  .numbers{padding:0 28px}
+  .numbers{padding:0 20px}
   .numbers-inner{grid-template-columns:repeat(2,1fr)}
-  .num-item{border-bottom:1px solid rgba(255,255,255,.06)}
-  section{padding:72px 28px}
-  .svc-layout,.paraquem-layout,.processo-layout,.plans-head,.dep-layout{grid-template-columns:1fr;gap:32px}
-  .paraquem-grid{grid-template-columns:1fr 1fr}
+  .num-item{border-bottom:1px solid rgba(255,255,255,.06);padding:28px 12px}
+  .num-val{font-size:2.2rem}
+  section{padding:64px 22px}
+  .svc-layout,.paraquem-layout,.processo-layout,.plans-head,.dep-layout{grid-template-columns:1fr;gap:28px}
+  .paraquem-grid{grid-template-columns:1fr 1fr;gap:14px}
   .svc-grid{grid-template-columns:1fr}
-  .steps{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr);row-gap:32px}
   .steps::before{display:none}
-  .plans-grid{grid-template-columns:1fr}
+  .plans-grid{grid-template-columns:1fr;gap:16px}
   .dep-grid{grid-template-columns:1fr}
   .footer-top{grid-template-columns:1fr 1fr;gap:28px}
   .footer-bottom{flex-direction:column;text-align:center}
-  .cta-final{padding:72px 28px}
-  footer{padding:40px 28px 24px}
+  .cta-final{padding:64px 22px}
+  .cta-btns{flex-direction:column;width:100%}
+  .cta-white,.cta-ghost-w{width:100%;justify-content:center}
+  footer{padding:40px 22px 24px}
   .fr2{grid-template-columns:1fr}
+}
+
+@media(max-width:560px){
+  .paraquem-grid{grid-template-columns:1fr}
+  .numbers-inner{grid-template-columns:1fr 1fr}
+  .footer-top{grid-template-columns:1fr;gap:32px}
+  .steps{grid-template-columns:1fr;row-gap:28px}
+  .modal-box{padding:28px 22px;border-radius:14px}
+  .fr2{grid-template-columns:1fr}
+  section{padding:56px 20px}
+  .s-title{font-size:clamp(1.9rem,7vw,2.4rem)}
 }
 
 /* ── EDIT MODE ── */
@@ -537,10 +581,11 @@ footer{background:#060912;padding:52px 60px 32px}
 .app-plan-btn:hover{background:var(--cream)}
 
 @media(max-width:1060px){
-  .plans-grid{grid-template-columns:1fr}
   .hc-arrow{display:none}
-  .hc-dots{bottom:14px}
-  .hc-dot{padding:6px 10px;font-size:.65rem}
+  .hc-dots{bottom:16px;padding:5px;gap:5px}
+  .hc-dot{padding:0;width:8px;height:8px;border-radius:50%;background:var(--lp-border)}
+  .hc-dot.on{width:22px;border-radius:100px}
+  .hc-dot-label{display:none}
   .diag-mini{width:100%}
   .hero-diag .hero-right,.hero-app .hero-right{display:none}
 }
