@@ -539,52 +539,67 @@ footer{background:#060912;padding:52px 60px 32px}
 }
 
 /* ── ENQUADRAMENTO 100vh — banners cabem na primeira dobra, sem scroll ── */
-.hero-carousel{height:100vh;height:100dvh;min-height:540px}
+.hero-carousel{height:100vh;height:100dvh;min-height:600px}
 .hc-track{height:100%}
 .hero.hc-slide{
   height:100%;min-height:0;
-  padding:84px 96px 88px;
+  grid-template-columns:1.15fr 1fr;
+  column-gap:48px;
+  padding:88px 80px 92px;
   overflow:hidden;
 }
-.hero.hc-slide h1{font-size:clamp(2.3rem,3.8vw,3.9rem);margin-bottom:18px}
-.hero.hc-slide .hero-eyebrow{margin-bottom:16px}
-.hero.hc-slide .hero-desc{margin-bottom:26px;font-size:.98rem;line-height:1.65}
+.hero.hc-slide .hero-left{max-width:640px}
+.hero.hc-slide h1{font-size:clamp(2.9rem,4.6vw,4.7rem);margin-bottom:24px}
+.hero.hc-slide .hero-eyebrow{margin-bottom:20px;font-size:.8rem}
+.hero.hc-slide .hero-desc{margin-bottom:34px;font-size:1.15rem;line-height:1.72;max-width:560px}
 .hero.hc-slide .hero-ctas .btn-primary,
-.hero.hc-slide .hero-ctas .btn-secondary{padding:12px 24px;font-size:.86rem}
-.hero.hc-slide .hero-trust{margin-top:28px;padding-top:22px;gap:26px}
-.hero.hc-slide .trust-num{font-size:1.55rem}
-.hero.hc-slide .trust-text{font-size:.72rem}
-.hero.hc-slide .panel{padding:24px;width:350px}
-.hero.hc-slide .panel-header{margin-bottom:18px}
-.hero.hc-slide .panel-metrics{margin-bottom:16px;gap:10px}
-.hero.hc-slide .metric-box{padding:12px}
-.hero.hc-slide .metric-val{font-size:1.55rem}
-.hero.hc-slide .panel-divider{margin-bottom:12px}
-.hero.hc-slide .panel-row{padding:7px 0}
-.hero.hc-slide .diag-mini{width:370px}
-.hero.hc-slide .dm-q{font-size:.88rem;margin-bottom:14px}
-.hero.hc-slide .dm-score{font-size:2.1rem;min-width:46px;padding:8px 5px}
-.hero.hc-slide .dm-score-row{margin-bottom:12px}
-.hero.hc-slide .dm-msg{margin-bottom:14px;padding:11px 13px;min-height:58px;font-size:.78rem}
-.hero.hc-slide .diag-cta{padding:12px;font-size:.88rem}
-.hero.hc-slide .fc1{top:8px;left:-70px}
-.hero.hc-slide .fc2{bottom:14px;left:-80px}
-.hc-dots{bottom:20px}
+.hero.hc-slide .hero-ctas .btn-secondary{padding:15px 30px;font-size:.95rem}
+.hero.hc-slide .hero-trust{margin-top:38px;padding-top:28px;gap:36px}
+.hero.hc-slide .trust-num{font-size:2rem}
+.hero.hc-slide .trust-text{font-size:.8rem}
+.hero.hc-slide .hero-right{justify-content:center}
+.hero.hc-slide .panel{padding:34px;width:100%;max-width:440px}
+.hero.hc-slide .panel-header{margin-bottom:26px}
+.hero.hc-slide .panel-title{font-size:.8rem}
+.hero.hc-slide .panel-metrics{margin-bottom:24px;gap:16px}
+.hero.hc-slide .metric-box{padding:18px}
+.hero.hc-slide .metric-lbl{font-size:.74rem}
+.hero.hc-slide .metric-val{font-size:2.1rem}
+.hero.hc-slide .panel-divider{margin-bottom:20px}
+.hero.hc-slide .panel-rows{gap:14px}
+.hero.hc-slide .panel-row{padding:10px 0}
+.hero.hc-slide .row-label{font-size:.9rem}
+.hero.hc-slide .row-val{font-size:.88rem}
+.hero.hc-slide .row-icon{width:36px;height:36px;font-size:1rem}
+.hero.hc-slide .diag-mini{width:100%;max-width:460px}
+.hero.hc-slide .dm-q{font-size:1.05rem;margin-bottom:22px}
+.hero.hc-slide .dm-score{font-size:2.6rem;min-width:58px;padding:12px 8px}
+.hero.hc-slide .dm-score-row{margin-bottom:20px;gap:22px}
+.hero.hc-slide .dm-msg{margin-bottom:24px;padding:16px 18px;min-height:70px;font-size:.9rem}
+.hero.hc-slide .diag-cta{padding:16px;font-size:1rem}
+.hero.hc-slide .diag-note{font-size:.8rem;margin-top:12px}
+.hero.hc-slide .fc1{top:6px;left:-84px;padding:14px 18px}
+.hero.hc-slide .fc2{bottom:10px;left:-96px;padding:14px 18px}
+.hero.hc-slide .fc-label{font-size:.72rem}
+.hero.hc-slide .fc-val{font-size:.92rem}
+.hc-dots{bottom:22px}
 
-/* Telas mais baixas (notebooks) — compactar ainda mais */
+/* Telas mais baixas (notebooks) — compactar levemente */
 @media(max-height:760px){
-  .hero.hc-slide{padding:78px 96px 74px}
-  .hero.hc-slide h1{font-size:clamp(2rem,3.2vw,3.1rem);margin-bottom:14px}
-  .hero.hc-slide .hero-desc{margin-bottom:20px;font-size:.9rem;max-width:430px}
-  .hero.hc-slide .hero-trust{margin-top:20px;padding-top:16px}
-  .hero.hc-slide .panel{padding:20px;width:330px}
+  .hero.hc-slide{padding:80px 80px 76px}
+  .hero.hc-slide h1{font-size:clamp(2.4rem,3.8vw,3.6rem);margin-bottom:18px}
+  .hero.hc-slide .hero-desc{margin-bottom:24px;font-size:1rem;max-width:500px}
+  .hero.hc-slide .hero-trust{margin-top:24px;padding-top:18px}
+  .hero.hc-slide .panel{padding:26px;max-width:400px}
+  .hero.hc-slide .metric-val{font-size:1.7rem}
   .hero.hc-slide .diag-note{display:none}
 }
 
 /* Mobile — mantém 1 dobra com conteúdo compacto */
 @media(max-width:1060px){
   .hero.hc-slide{padding:86px 24px 96px;display:flex;flex-direction:column;justify-content:center}
+  .hero.hc-slide .hero-left{max-width:none}
   .hero.hc-slide h1{font-size:clamp(1.9rem,8vw,2.6rem)}
-  .hero.hc-slide .hero-desc{font-size:.9rem}
+  .hero.hc-slide .hero-desc{font-size:.9rem;max-width:none}
   .hero.hc-slide .hero-trust{gap:18px}
 }
