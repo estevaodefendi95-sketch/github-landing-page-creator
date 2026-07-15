@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import nortyxLogo from "@/assets/nortyx-logo.png.asset.json";
 import { supabase } from "@/lib/supabase-client";
 
@@ -16,10 +16,29 @@ type BannerContent = {
   desc: string;
 };
 
+type CardText = { name: string; desc: string };
+type Testimonial = { text: string; name: string; role: string };
+type DiagCard = { tag: string; titleLines: string[]; desc: string; note: string };
+
 type SiteContent = {
   banner1: BannerContent;
   banner2: BannerContent;
   banner3: BannerContent;
+  headings: {
+    servicos: BannerContent;
+    paraquem: BannerContent;
+    processo: BannerContent;
+    planos: BannerContent;
+    depoimentos: BannerContent;
+    diagnostico: BannerContent;
+    ctaFinal: BannerContent;
+  };
+  services: CardText[];
+  paraquemCards: CardText[];
+  steps: CardText[];
+  testimonials: Testimonial[];
+  diagCard: DiagCard;
+  footerTagline: string;
 };
 
 const DEFAULT_CONTENT: SiteContent = {
@@ -44,6 +63,51 @@ const DEFAULT_CONTENT: SiteContent = {
     titleLastEm: "aplicativo.",
     desc: "Fluxo de caixa, DRE automático, contas a pagar e receber, cobranças e metas — direto do celular ou computador. Adquira somente o app, com implantação inclusa.",
   },
+  headings: {
+    servicos: { eyebrow: "O que entregamos", titleLines: ["Consultoria", "financeira"], titleLastPrefix: "", titleLastEm: "completa.", desc: "Cada entrega é pensada para dar a você clareza total sobre o dinheiro do seu negócio — e um caminho concreto para crescer." },
+    paraquem: { eyebrow: "Para quem é", titleLines: ["Para quem trabalha", "duro e merece"], titleLastPrefix: "", titleLastEm: "ver resultado.", desc: "Se você fatura bem mas o dinheiro some no fim do mês — a Nortyx é para você. Atendemos profissionais autônomos, PJs e pequenas empresas de qualquer setor." },
+    processo: { eyebrow: "Como funciona", titleLines: ["Do diagnóstico", "ao resultado"], titleLastPrefix: "", titleLastEm: "em 4 etapas.", desc: "Processo claro, sem burocracia. Você sabe exatamente o que acontece em cada etapa e quando vai ver os primeiros resultados." },
+    planos: { eyebrow: "Planos e preços", titleLines: ["Invista na saúde", "financeira do"], titleLastPrefix: "", titleLastEm: "seu negócio.", desc: "Sem contratos longos, sem surpresas. Escolha o plano, preencha o formulário e entraremos em contato em até 24h." },
+    depoimentos: { eyebrow: "Clientes", titleLines: ["Resultados que"], titleLastPrefix: "", titleLastEm: "falam por si.", desc: "Profissionais e pequenas empresas que transformaram suas finanças com a Nortyx." },
+    diagnostico: { eyebrow: "Diagnóstico gratuito", titleLines: ["Descubra a saúde", "financeira do seu"], titleLastPrefix: "", titleLastEm: "negócio agora.", desc: "Responda 20 perguntas em menos de 5 minutos e receba um diagnóstico personalizado com seu score financeiro e o plano ideal para você." },
+    ctaFinal: { eyebrow: "", titleLines: ["Chega de não saber", "o que sobra no"], titleLastPrefix: "", titleLastEm: "fim do mês.", desc: "Agende uma conversa gratuita com Estevão e descubra como a Nortyx pode organizar as finanças do seu negócio." },
+  },
+  services: [
+    { name: "Diagnóstico Financeiro", desc: "Análise completa da situação atual: onde entra, onde sai, o que sobra. Identificamos os gargalos que estão travando o crescimento do seu negócio." },
+    { name: "Fluxo de Caixa", desc: "Controle detalhado de todas as entradas e saídas. Você passa a saber exatamente quanto vai sobrar — antes do mês acabar." },
+    { name: "DRE Simplificado", desc: "Demonstrativo de resultados mensal em linguagem clara — sem jargão contábil. Você entende o que lucrou e por quê." },
+    { name: "Planejamento Financeiro", desc: "Metas claras, orçamento estruturado e plano de ação para os próximos meses. Crescimento com previsibilidade e propósito." },
+    { name: "Controle de Inadimplência", desc: "Mapeamento de clientes em atraso, estratégias de cobrança e processos para reduzir a inadimplência e aumentar a previsibilidade da receita." },
+    { name: "Reuniões Mensais", desc: "Acompanhamento dedicado com Estevão: revisão dos resultados, ajuste de metas e alinhamento estratégico para o próximo período." },
+  ],
+  paraquemCards: [
+    { name: "Advogados", desc: "Controle de honorários, gestão de recebíveis e planejamento financeiro para escritórios de qualquer porte." },
+    { name: "Médicos e Clínicas", desc: "Equilibrio financeiro, controle de recebíveis e visibilidade total do caixa para profissionais de saúde." },
+    { name: "Agências", desc: "Gestão financeira da agência, controle por cliente e previsibilidade para escalar com saúde." },
+    { name: "Dentistas", desc: "Controle de parcelas de tratamentos e gestão financeira para clínicas odontológicas." },
+    { name: "Prestadores de Serviço", desc: "Contadores, arquitetos, consultores e qualquer PJ que quer clareza financeira." },
+    { name: "Academias e Estúdios", desc: "Controle de mensalidades, custos e planejamento para negócios do setor fitness." },
+    { name: "Escolas e Cursos", desc: "Gestão de mensalidades, inadimplência e fluxo de caixa para o setor educacional." },
+    { name: "Estética e Bem-estar", desc: "Controle financeiro para clínicas de estética, salões e profissionais de bem-estar." },
+  ],
+  steps: [
+    { name: "Diagnóstico", desc: "Reunião inicial para mapear a situação financeira atual, identificar gargalos e entender os objetivos do negócio." },
+    { name: "Plano", desc: "Apresentação do plano de ação personalizado com prioridades, metas e o que será feito em cada mês." },
+    { name: "Execução", desc: "Implementação do controle financeiro, organização do fluxo de caixa e entrega dos relatórios mensais." },
+    { name: "Acompanhamento", desc: "Reunião mensal para revisar resultados, ajustar metas e garantir que o negócio está no caminho certo." },
+  ],
+  testimonials: [
+    { text: "Eu faturava bem mas nunca sobrava dinheiro. A Nortyx organizou todo o meu fluxo de caixa e em 2 meses eu já tinha clareza total sobre o que acontecia com o meu dinheiro.", name: "Dr. Rafael M.", role: "Advogado — SP" },
+    { text: "A consultoria mensal com o Estevão mudou como eu vejo o financeiro da clínica. Hoje tenho DRE, fluxo de caixa e metas claras. Nunca tive tanto controle assim.", name: "Dra. Marina S.", role: "Médica — Clínica Particular" },
+    { text: "Minha agência crescia mas eu não sabia se estava lucrando de verdade. O Estevão montou o planejamento financeiro e hoje tomo decisões com base em números reais.", name: "Carlos A.", role: "CEO — Agência de Marketing" },
+  ],
+  diagCard: {
+    tag: "📊 Diagnóstico Financeiro — Nortyx",
+    titleLines: ["Teste gratuito", "em 5 minutos"],
+    desc: "Descubra onde estão os gargalos financeiros do seu negócio e o que fazer para resolvê-los.",
+    note: "Leva menos de 5 minutos · Resultado imediato",
+  },
+  footerTagline: "Consultoria financeira para profissionais autônomos e pequenas empresas.",
 };
 
 const WHATSAPP_BASE = "https://wa.me/5516991776593";
@@ -195,18 +259,57 @@ function LandingPage() {
         .maybeSingle();
       if (!cancelled && !error && data?.content) {
         const saved = data.content as Partial<SiteContent>;
-        setContent({
-          banner1: { ...DEFAULT_CONTENT.banner1, ...saved.banner1 },
-          banner2: { ...DEFAULT_CONTENT.banner2, ...saved.banner2 },
-          banner3: { ...DEFAULT_CONTENT.banner3, ...saved.banner3 },
-        });
+        setContent((c) => ({
+          banner1: { ...c.banner1, ...saved.banner1 },
+          banner2: { ...c.banner2, ...saved.banner2 },
+          banner3: { ...c.banner3, ...saved.banner3 },
+          headings: {
+            servicos: { ...c.headings.servicos, ...saved.headings?.servicos },
+            paraquem: { ...c.headings.paraquem, ...saved.headings?.paraquem },
+            processo: { ...c.headings.processo, ...saved.headings?.processo },
+            planos: { ...c.headings.planos, ...saved.headings?.planos },
+            depoimentos: { ...c.headings.depoimentos, ...saved.headings?.depoimentos },
+            diagnostico: { ...c.headings.diagnostico, ...saved.headings?.diagnostico },
+            ctaFinal: { ...c.headings.ctaFinal, ...saved.headings?.ctaFinal },
+          },
+          services: saved.services && saved.services.length === c.services.length ? saved.services : c.services,
+          paraquemCards: saved.paraquemCards && saved.paraquemCards.length === c.paraquemCards.length ? saved.paraquemCards : c.paraquemCards,
+          steps: saved.steps && saved.steps.length === c.steps.length ? saved.steps : c.steps,
+          testimonials: saved.testimonials && saved.testimonials.length === c.testimonials.length ? saved.testimonials : c.testimonials,
+          diagCard: { ...c.diagCard, ...saved.diagCard },
+          footerTagline: saved.footerTagline ?? c.footerTagline,
+        }));
       }
     })();
     return () => { cancelled = true; };
   }, []);
 
-  function updateBannerField(banner: keyof SiteContent, field: keyof BannerContent, value: string | string[]) {
+  function updateBannerField(banner: "banner1" | "banner2" | "banner3", field: keyof BannerContent, value: string | string[]) {
     setContent((c) => ({ ...c, [banner]: { ...c[banner], [field]: value } }));
+  }
+
+  function updateHeadingField(key: keyof SiteContent["headings"], field: keyof BannerContent, value: string | string[]) {
+    setContent((c) => ({ ...c, headings: { ...c.headings, [key]: { ...c.headings[key], [field]: value } } }));
+  }
+
+  function updateListItem(group: "services" | "paraquemCards" | "steps", index: number, field: keyof CardText, value: string) {
+    setContent((c) => {
+      const list = [...c[group]];
+      list[index] = { ...list[index], [field]: value };
+      return { ...c, [group]: list };
+    });
+  }
+
+  function updateTestimonial(index: number, field: keyof Testimonial, value: string) {
+    setContent((c) => {
+      const list = [...c.testimonials];
+      list[index] = { ...list[index], [field]: value };
+      return { ...c, testimonials: list };
+    });
+  }
+
+  function updateDiagCard(field: keyof DiagCard, value: string | string[]) {
+    setContent((c) => ({ ...c, diagCard: { ...c.diagCard, [field]: value } }));
   }
 
   async function saveContent() {
@@ -239,9 +342,58 @@ function LandingPage() {
     setSubmitted(true);
   }
 
-  function renderBannerHeader(key: keyof SiteContent) {
+  const editableStyle = editMode ? { outline: "1.5px dashed rgba(26,36,84,.35)", outlineOffset: 2, borderRadius: 3 } : undefined;
+
+  // Título genérico (linhas + prefixo/itálico final) — usado no hero (h1) e nas seções (h2)
+  function renderTitleTag(
+    tag: "h1" | "h2",
+    tagClassName: string | undefined,
+    b: BannerContent,
+    onChange: (field: keyof BannerContent, value: string | string[]) => void,
+  ) {
+    const Tag = tag as any;
+    return (
+      <Tag className={tagClassName}>
+        {b.titleLines.map((line, i) => (
+          <span key={i}>
+            <span
+              contentEditable={editMode}
+              suppressContentEditableWarning
+              style={editableStyle}
+              onBlur={(e) => {
+                const lines = [...b.titleLines];
+                lines[i] = e.currentTarget.textContent || "";
+                onChange("titleLines", lines);
+              }}
+            >
+              {line}
+            </span>
+            <br />
+          </span>
+        ))}
+        <span
+          contentEditable={editMode}
+          suppressContentEditableWarning
+          style={editableStyle}
+          onBlur={(e) => onChange("titleLastPrefix", e.currentTarget.textContent || "")}
+        >
+          {b.titleLastPrefix}
+        </span>
+        <em
+          contentEditable={editMode}
+          suppressContentEditableWarning
+          style={editableStyle}
+          onBlur={(e) => onChange("titleLastEm", e.currentTarget.textContent || "")}
+        >
+          {b.titleLastEm}
+        </em>
+      </Tag>
+    );
+  }
+
+  function renderBannerHeader(key: "banner1" | "banner2" | "banner3") {
     const b = content[key];
-    const editableStyle = editMode ? { outline: "1.5px dashed rgba(26,36,84,.35)", outlineOffset: 2, borderRadius: 3 } : undefined;
+    const onChange = (field: keyof BannerContent, value: string | string[]) => updateBannerField(key, field, value);
     return (
       <>
         <div
@@ -249,54 +401,94 @@ function LandingPage() {
           contentEditable={editMode}
           suppressContentEditableWarning
           style={editableStyle}
-          onBlur={(e) => updateBannerField(key, "eyebrow", e.currentTarget.textContent || "")}
+          onBlur={(e) => onChange("eyebrow", e.currentTarget.textContent || "")}
         >
           {b.eyebrow}
         </div>
-        <h1>
-          {b.titleLines.map((line, i) => (
-            <span key={i}>
-              <span
-                contentEditable={editMode}
-                suppressContentEditableWarning
-                style={editableStyle}
-                onBlur={(e) => {
-                  const lines = [...b.titleLines];
-                  lines[i] = e.currentTarget.textContent || "";
-                  updateBannerField(key, "titleLines", lines);
-                }}
-              >
-                {line}
-              </span>
-              <br />
-            </span>
-          ))}
-          <span
-            contentEditable={editMode}
-            suppressContentEditableWarning
-            style={editableStyle}
-            onBlur={(e) => updateBannerField(key, "titleLastPrefix", e.currentTarget.textContent || "")}
-          >
-            {b.titleLastPrefix}
-          </span>
-          <em
-            contentEditable={editMode}
-            suppressContentEditableWarning
-            style={editableStyle}
-            onBlur={(e) => updateBannerField(key, "titleLastEm", e.currentTarget.textContent || "")}
-          >
-            {b.titleLastEm}
-          </em>
-        </h1>
+        {renderTitleTag("h1", undefined, b, onChange)}
         <p
           className="hero-desc"
           contentEditable={editMode}
           suppressContentEditableWarning
           style={editableStyle}
-          onBlur={(e) => updateBannerField(key, "desc", e.currentTarget.textContent || "")}
+          onBlur={(e) => onChange("desc", e.currentTarget.textContent || "")}
         >
           {b.desc}
         </p>
+      </>
+    );
+  }
+
+  // Cabeçalho de seção (tag + título + subtítulo) — reaproveita a mesma estrutura do hero
+  function renderHeadingTagTitle(key: keyof SiteContent["headings"]) {
+    const h = content.headings[key];
+    const onChange = (field: keyof BannerContent, value: string | string[]) => updateHeadingField(key, field, value);
+    return (
+      <>
+        {h.eyebrow !== "" || editMode ? (
+          <div
+            className="s-tag rv"
+            contentEditable={editMode}
+            suppressContentEditableWarning
+            style={editableStyle}
+            onBlur={(e) => onChange("eyebrow", e.currentTarget.textContent || "")}
+          >
+            {h.eyebrow}
+          </div>
+        ) : null}
+        {renderTitleTag("h2", "s-title rv", h, onChange)}
+      </>
+    );
+  }
+
+  function renderHeadingSub(key: keyof SiteContent["headings"], subStyle?: CSSProperties) {
+    const h = content.headings[key];
+    return (
+      <p
+        className="s-sub rv"
+        style={subStyle}
+        contentEditable={editMode}
+        suppressContentEditableWarning
+        onBlur={(e) => updateHeadingField(key, "desc", e.currentTarget.textContent || "")}
+      >
+        {h.desc}
+      </p>
+    );
+  }
+
+  // Cabeçalho completo (tag + título + subtítulo juntos) — usado quando o sub fica na mesma coluna
+  function renderHeading(key: keyof SiteContent["headings"], subStyle?: CSSProperties) {
+    return (
+      <>
+        {renderHeadingTagTitle(key)}
+        {renderHeadingSub(key, subStyle)}
+      </>
+    );
+  }
+
+  // Card simples de nome + descrição (serviços, para quem, etapas)
+  function renderCardText(group: "services" | "paraquemCards" | "steps", index: number, nameClass: string, descClass: string) {
+    const item = content[group][index];
+    return (
+      <>
+        <div
+          className={nameClass}
+          contentEditable={editMode}
+          suppressContentEditableWarning
+          style={editableStyle}
+          onBlur={(e) => updateListItem(group, index, "name", e.currentTarget.textContent || "")}
+        >
+          {item.name}
+        </div>
+        <div
+          className={descClass}
+          contentEditable={editMode}
+          suppressContentEditableWarning
+          style={editableStyle}
+          onBlur={(e) => updateListItem(group, index, "desc", e.currentTarget.textContent || "")}
+        >
+          {item.desc}
+        </div>
       </>
     );
   }
@@ -645,25 +837,20 @@ function LandingPage() {
         <div className="section-inner">
           <div className="svc-layout">
             <div>
-              <div className="s-tag rv">O que entregamos</div>
-              <h2 className="s-title rv">Consultoria<br />financeira<br /><em>completa.</em></h2>
-              <p className="s-sub rv" style={{ marginTop: 0 }}>
-                Cada entrega é pensada para dar a você clareza total sobre o dinheiro do seu negócio — e um caminho concreto para crescer.
-              </p>
+              {renderHeading("servicos", { marginTop: 0 })}
             </div>
             <div className="svc-grid">
               {[
-                { n: "01", name: "Diagnóstico Financeiro", desc: "Análise completa da situação atual: onde entra, onde sai, o que sobra. Identificamos os gargalos que estão travando o crescimento do seu negócio.", tags: ["Diagnóstico", "Análise"] },
-                { n: "02", name: "Fluxo de Caixa", desc: "Controle detalhado de todas as entradas e saídas. Você passa a saber exatamente quanto vai sobrar — antes do mês acabar.", tags: ["Fluxo de caixa", "Projeções"] },
-                { n: "03", name: "DRE Simplificado", desc: "Demonstrativo de resultados mensal em linguagem clara — sem jargão contábil. Você entende o que lucrou e por quê.", tags: ["DRE", "Relatórios"] },
-                { n: "04", name: "Planejamento Financeiro", desc: "Metas claras, orçamento estruturado e plano de ação para os próximos meses. Crescimento com previsibilidade e propósito.", tags: ["Metas", "Orçamento"] },
-                { n: "05", name: "Controle de Inadimplência", desc: "Mapeamento de clientes em atraso, estratégias de cobrança e processos para reduzir a inadimplência e aumentar a previsibilidade da receita.", tags: ["Recebíveis", "Cobrança"] },
-                { n: "06", name: "Reuniões Mensais", desc: "Acompanhamento dedicado com Estevão: revisão dos resultados, ajuste de metas e alinhamento estratégico para o próximo período.", tags: ["Mentoria", "Acompanhamento"] },
-              ].map((s) => (
+                { n: "01", tags: ["Diagnóstico", "Análise"] },
+                { n: "02", tags: ["Fluxo de caixa", "Projeções"] },
+                { n: "03", tags: ["DRE", "Relatórios"] },
+                { n: "04", tags: ["Metas", "Orçamento"] },
+                { n: "05", tags: ["Recebíveis", "Cobrança"] },
+                { n: "06", tags: ["Mentoria", "Acompanhamento"] },
+              ].map((s, i) => (
                 <div key={s.n} className="svc-card rv">
                   <div className="svc-num">{s.n}</div>
-                  <div className="svc-name">{s.name}</div>
-                  <div className="svc-desc">{s.desc}</div>
+                  {renderCardText("services", i, "svc-name", "svc-desc")}
                   <div className="svc-tags">
                     {s.tags.map((t) => <span key={t} className="svc-tag">{t}</span>)}
                   </div>
@@ -679,18 +866,14 @@ function LandingPage() {
         <div className="section-inner">
           <div className="paraquem-layout">
             <div>
-              <div className="s-tag rv">Para quem é</div>
-              <h2 className="s-title rv">Para quem trabalha<br />duro e merece<br /><em>ver resultado.</em></h2>
+              {renderHeadingTagTitle("paraquem")}
             </div>
-            <p className="s-sub rv">
-              Se você fatura bem mas o dinheiro some no fim do mês — a Nortyx é para você. Atendemos profissionais autônomos, PJs e pequenas empresas de qualquer setor.
-            </p>
+            {renderHeadingSub("paraquem")}
           </div>
           <div className="paraquem-grid">
             <div className="pq-card featured rv">
               <span className="pq-icon">⚖️</span>
-              <div className="pq-name">Advogados</div>
-              <div className="pq-desc">Controle de honorários, gestão de recebíveis e planejamento financeiro para escritórios de qualquer porte.</div>
+              {renderCardText("paraquemCards", 0, "pq-name", "pq-desc")}
               <div className="pq-features">
                 <div className="pq-feat">Controle de honorários</div>
                 <div className="pq-feat">Redução de inadimplência</div>
@@ -699,8 +882,7 @@ function LandingPage() {
             </div>
             <div className="pq-card featured rv">
               <span className="pq-icon">🩺</span>
-              <div className="pq-name">Médicos e Clínicas</div>
-              <div className="pq-desc">Equilibrio financeiro, controle de recebíveis e visibilidade total do caixa para profissionais de saúde.</div>
+              {renderCardText("paraquemCards", 1, "pq-name", "pq-desc")}
               <div className="pq-features">
                 <div className="pq-feat">Fluxo de caixa</div>
                 <div className="pq-feat">Controle de pacientes</div>
@@ -709,25 +891,17 @@ function LandingPage() {
             </div>
             <div className="pq-card featured rv">
               <span className="pq-icon">📣</span>
-              <div className="pq-name">Agências</div>
-              <div className="pq-desc">Gestão financeira da agência, controle por cliente e previsibilidade para escalar com saúde.</div>
+              {renderCardText("paraquemCards", 2, "pq-name", "pq-desc")}
               <div className="pq-features">
                 <div className="pq-feat">Receita por cliente</div>
                 <div className="pq-feat">Fluxo de caixa</div>
                 <div className="pq-feat">Metas de crescimento</div>
               </div>
             </div>
-            {[
-              { icon: "🦷", name: "Dentistas", desc: "Controle de parcelas de tratamentos e gestão financeira para clínicas odontológicas." },
-              { icon: "🔧", name: "Prestadores de Serviço", desc: "Contadores, arquitetos, consultores e qualquer PJ que quer clareza financeira." },
-              { icon: "🏋️", name: "Academias e Estúdios", desc: "Controle de mensalidades, custos e planejamento para negócios do setor fitness." },
-              { icon: "🏫", name: "Escolas e Cursos", desc: "Gestão de mensalidades, inadimplência e fluxo de caixa para o setor educacional." },
-              { icon: "💆", name: "Estética e Bem-estar", desc: "Controle financeiro para clínicas de estética, salões e profissionais de bem-estar." },
-            ].map((c) => (
-              <div key={c.name} className="pq-card rv">
-                <span className="pq-icon">{c.icon}</span>
-                <div className="pq-name">{c.name}</div>
-                <div className="pq-desc">{c.desc}</div>
+            {["🦷", "🔧", "🏋️", "🏫", "💆"].map((icon, i) => (
+              <div key={icon} className="pq-card rv">
+                <span className="pq-icon">{icon}</span>
+                {renderCardText("paraquemCards", i + 3, "pq-name", "pq-desc")}
               </div>
             ))}
             <div className="pq-more rv">
@@ -749,24 +923,15 @@ function LandingPage() {
         <div className="section-inner">
           <div className="processo-layout">
             <div>
-              <div className="s-tag rv">Como funciona</div>
-              <h2 className="s-title rv">Do diagnóstico<br />ao resultado<br /><em>em 4 etapas.</em></h2>
+              {renderHeadingTagTitle("processo")}
             </div>
-            <p className="s-sub rv">
-              Processo claro, sem burocracia. Você sabe exatamente o que acontece em cada etapa e quando vai ver os primeiros resultados.
-            </p>
+            {renderHeadingSub("processo")}
           </div>
           <div className="steps">
-            {[
-              { n: "01", name: "Diagnóstico", desc: "Reunião inicial para mapear a situação financeira atual, identificar gargalos e entender os objetivos do negócio." },
-              { n: "02", name: "Plano", desc: "Apresentação do plano de ação personalizado com prioridades, metas e o que será feito em cada mês." },
-              { n: "03", name: "Execução", desc: "Implementação do controle financeiro, organização do fluxo de caixa e entrega dos relatórios mensais." },
-              { n: "04", name: "Acompanhamento", desc: "Reunião mensal para revisar resultados, ajustar metas e garantir que o negócio está no caminho certo." },
-            ].map((s) => (
-              <div key={s.n} className="step rv">
-                <div className="step-num">{s.n}</div>
-                <div className="step-name">{s.name}</div>
-                <div className="step-desc">{s.desc}</div>
+            {["01", "02", "03", "04"].map((n, i) => (
+              <div key={n} className="step rv">
+                <div className="step-num">{n}</div>
+                {renderCardText("steps", i, "step-name", "step-desc")}
               </div>
             ))}
           </div>
@@ -778,13 +943,10 @@ function LandingPage() {
         <div className="section-inner">
           <div className="plans-head">
             <div>
-              <div className="s-tag rv">Planos e preços</div>
-              <h2 className="s-title rv">Invista na saúde<br />financeira do<br /><em>seu negócio.</em></h2>
+              {renderHeadingTagTitle("planos")}
             </div>
             <div>
-              <p className="s-sub rv">
-                Sem contratos longos, sem surpresas. Escolha o plano, preencha o formulário e entraremos em contato em até 24h.
-              </p>
+              {renderHeadingSub("planos")}
               <div className="billing-toggle rv">
                 <span className={`tgl-lbl ${!annual ? "on" : ""}`}>Mensal</span>
                 <label className="tgl">
@@ -914,28 +1076,45 @@ function LandingPage() {
         <div className="section-inner">
           <div className="dep-layout">
             <div>
-              <div className="s-tag rv">Clientes</div>
-              <h2 className="s-title rv">Resultados que<br /><em>falam por si.</em></h2>
+              {renderHeadingTagTitle("depoimentos")}
             </div>
-            <p className="s-sub rv">
-              Profissionais e pequenas empresas que transformaram suas finanças com a Nortyx.
-            </p>
+            {renderHeadingSub("depoimentos")}
           </div>
           <div className="dep-grid">
-            {[
-              { initials: "DR", name: "Dr. Rafael M.", role: "Advogado — SP", text: "Eu faturava bem mas nunca sobrava dinheiro. A Nortyx organizou todo o meu fluxo de caixa e em 2 meses eu já tinha clareza total sobre o que acontecia com o meu dinheiro." },
-              { initials: "DM", name: "Dra. Marina S.", role: "Médica — Clínica Particular", text: "A consultoria mensal com o Estevão mudou como eu vejo o financeiro da clínica. Hoje tenho DRE, fluxo de caixa e metas claras. Nunca tive tanto controle assim." },
-              { initials: "CA", name: "Carlos A.", role: "CEO — Agência de Marketing", text: "Minha agência crescia mas eu não sabia se estava lucrando de verdade. O Estevão montou o planejamento financeiro e hoje tomo decisões com base em números reais." },
-            ].map((d) => (
-              <div key={d.initials} className="dep rv">
+            {["DR", "DM", "CA"].map((initials, i) => (
+              <div key={initials} className="dep rv">
                 <div className="dep-quote">"</div>
-                <p className="dep-text">{d.text}</p>
+                <p
+                  className="dep-text"
+                  contentEditable={editMode}
+                  suppressContentEditableWarning
+                  style={editableStyle}
+                  onBlur={(e) => updateTestimonial(i, "text", e.currentTarget.textContent || "")}
+                >
+                  {content.testimonials[i].text}
+                </p>
                 <div className="dep-author">
-                  <div className="dep-avatar">{d.initials}</div>
+                  <div className="dep-avatar">{initials}</div>
                   <div>
                     <div className="dep-stars">★★★★★</div>
-                    <div className="dep-name">{d.name}</div>
-                    <div className="dep-role">{d.role}</div>
+                    <div
+                      className="dep-name"
+                      contentEditable={editMode}
+                      suppressContentEditableWarning
+                      style={editableStyle}
+                      onBlur={(e) => updateTestimonial(i, "name", e.currentTarget.textContent || "")}
+                    >
+                      {content.testimonials[i].name}
+                    </div>
+                    <div
+                      className="dep-role"
+                      contentEditable={editMode}
+                      suppressContentEditableWarning
+                      style={editableStyle}
+                      onBlur={(e) => updateTestimonial(i, "role", e.currentTarget.textContent || "")}
+                    >
+                      {content.testimonials[i].role}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -948,11 +1127,7 @@ function LandingPage() {
       <section id="diagnostico" className="diag-bg" style={{ padding: 0 }}>
         <div className="diag-inner">
           <div className="diag-left">
-            <div className="s-tag rv">Diagnóstico gratuito</div>
-            <h2 className="s-title rv">Descubra a saúde<br />financeira do seu<br /><em>negócio agora.</em></h2>
-            <p className="s-sub rv">
-              Responda 20 perguntas em menos de 5 minutos e receba um diagnóstico personalizado com seu score financeiro e o plano ideal para você.
-            </p>
+            {renderHeading("diagnostico")}
             <div className="diag-steps rv">
               <div className="diag-step">
                 <div className="diag-step-num">01</div>
@@ -970,10 +1145,42 @@ function LandingPage() {
           </div>
           <div className="rv">
             <div className="diag-card">
-              <div className="diag-card-tag">📊 Diagnóstico Financeiro — Nortyx</div>
-              <div className="diag-card-title">Teste gratuito<br />em 5 minutos</div>
-              <div className="diag-card-desc">
-                Descubra onde estão os gargalos financeiros do seu negócio e o que fazer para resolvê-los.
+              <div
+                className="diag-card-tag"
+                contentEditable={editMode}
+                suppressContentEditableWarning
+                style={editableStyle}
+                onBlur={(e) => updateDiagCard("tag", e.currentTarget.textContent || "")}
+              >
+                {content.diagCard.tag}
+              </div>
+              <div className="diag-card-title">
+                {content.diagCard.titleLines.map((line, i) => (
+                  <span key={i}>
+                    <span
+                      contentEditable={editMode}
+                      suppressContentEditableWarning
+                      style={editableStyle}
+                      onBlur={(e) => {
+                        const lines = [...content.diagCard.titleLines];
+                        lines[i] = e.currentTarget.textContent || "";
+                        updateDiagCard("titleLines", lines);
+                      }}
+                    >
+                      {line}
+                    </span>
+                    {i < content.diagCard.titleLines.length - 1 && <br />}
+                  </span>
+                ))}
+              </div>
+              <div
+                className="diag-card-desc"
+                contentEditable={editMode}
+                suppressContentEditableWarning
+                style={editableStyle}
+                onBlur={(e) => updateDiagCard("desc", e.currentTarget.textContent || "")}
+              >
+                {content.diagCard.desc}
               </div>
               <div className="diag-features">
                 <div className="diag-feature"><div className="diag-feature-icon">✓</div>Score financeiro de 0 a 100</div>
@@ -984,7 +1191,15 @@ function LandingPage() {
               <a href="https://nortyxdiagnostico.lovable.app" target="_blank" rel="noreferrer" className="diag-cta">
                 Fazer diagnóstico gratuito →
               </a>
-              <div className="diag-note">Leva menos de 5 minutos · Resultado imediato</div>
+              <div
+                className="diag-note"
+                contentEditable={editMode}
+                suppressContentEditableWarning
+                style={editableStyle}
+                onBlur={(e) => updateDiagCard("note", e.currentTarget.textContent || "")}
+              >
+                {content.diagCard.note}
+              </div>
             </div>
           </div>
         </div>
@@ -992,10 +1207,7 @@ function LandingPage() {
 
       {/* CTA FINAL */}
       <div className="cta-final">
-        <h2 className="s-title rv">Chega de não saber<br />o que sobra no<br /><em>fim do mês.</em></h2>
-        <p className="s-sub rv">
-          Agende uma conversa gratuita com Estevão e descubra como a Nortyx pode organizar as finanças do seu negócio.
-        </p>
+        {renderHeading("ctaFinal")}
         <div className="cta-btns rv">
           <a href={WHATSAPP_CTA} target="_blank" rel="noreferrer" className="cta-white">💬 Falar pelo WhatsApp</a>
           <a href="mailto:Nortyx.group@gmail.com" className="cta-ghost-w">✉️ Enviar e-mail</a>
@@ -1008,8 +1220,14 @@ function LandingPage() {
           <div className="footer-top">
             <div>
               <a href="#" className="footer-logo">nortyx<span>.</span></a>
-              <p className="footer-tagline">
-                Consultoria financeira para profissionais autônomos e pequenas empresas.
+              <p
+                className="footer-tagline"
+                contentEditable={editMode}
+                suppressContentEditableWarning
+                style={editableStyle}
+                onBlur={(e) => setContent((c) => ({ ...c, footerTagline: e.currentTarget.textContent || "" }))}
+              >
+                {content.footerTagline}
               </p>
             </div>
             <div>
