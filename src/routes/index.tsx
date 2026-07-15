@@ -63,10 +63,11 @@ function LandingPage() {
   const [hcSlide, setHcSlide] = useState(0);
   const [hcPaused, setHcPaused] = useState(false);
   const HC_TOTAL = 3;
+  const HC_INTERVALO_MS = 8000; // ← Tempo de cada banner (8s) — EDITE AQUI se quiser mais rápido/lento
 
   useEffect(() => {
     if (hcPaused) return;
-    const t = setInterval(() => setHcSlide((s) => (s + 1) % HC_TOTAL), 7000);
+    const t = setInterval(() => setHcSlide((s) => (s + 1) % HC_TOTAL), HC_INTERVALO_MS);
     return () => clearInterval(t);
   }, [hcPaused]);
 
