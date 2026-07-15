@@ -19,7 +19,16 @@ type BannerContent = {
 type CardText = { name: string; desc: string };
 type Testimonial = { text: string; name: string; role: string };
 type DiagCard = { tag: string; titleLines: string[]; desc: string; note: string };
-type PlanText = { name: string; tagline: string; features: string[] };
+type PlanText = {
+  name: string;
+  tagline: string;
+  features: string[];
+  monthly?: string;
+  annual?: string;
+  setup?: string;
+  priceText?: string;
+  periodText?: string;
+};
 
 type SiteContent = {
   banner1: BannerContent;
@@ -118,21 +127,29 @@ const DEFAULT_CONTENT: SiteContent = {
     essencial: {
       name: "Essencial",
       tagline: "Para organizar o financeiro e ter clareza do caixa.",
+      monthly: "R$ 790",
+      annual: "R$ 632",
       features: ["Diagnóstico financeiro inicial", "Controle de fluxo de caixa", "DRE mensal simplificado", "Relatório mensal em PDF", "1 reunião mensal (60 min)", "Suporte via WhatsApp"],
     },
     profissional: {
       name: "Profissional",
       tagline: "Para crescer com estratégia e controle real.",
+      monthly: "R$ 1.290",
+      annual: "R$ 1.032",
       features: ["Tudo do Essencial", "Planejamento financeiro anual", "Análise de precificação", "Controle de inadimplência", "2 reuniões mensais (60 min cada)", "Metas e OKRs financeiros", "Suporte prioritário", "Dashboard financeiro compartilhado"],
     },
     appNortyx: {
       name: "App Nortyx",
       tagline: "O aplicativo de gestão financeira da Nortyx — sem consultoria.",
+      monthly: "R$ 250",
+      setup: "R$ 1.500",
       features: ["Fluxo de caixa completo", "DRE automático", "Contas a pagar e receber", "Controle de inadimplência e cobranças", "Metas e relatórios gerenciais", "Acesso no celular e no computador (PWA)", "Implantação e treinamento inclusos no setup"],
     },
     appPersonalizado: {
       name: "App Personalizado",
       tagline: "Um aplicativo próprio, feito sob medida para a sua operação.",
+      priceText: "Consulta",
+      periodText: "Fale com Estevão para um orçamento",
       features: ["Levantamento completo do seu processo", "Desenvolvimento 100% sob medida", "Telas e fluxos exclusivos para o seu negócio", "Integração com sistemas que você já usa", "Treinamento da sua equipe", "Suporte e manutenção contínua", "Evolui junto com o seu negócio"],
     },
   },
@@ -147,17 +164,8 @@ const WHATSAPP_CUSTOM = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estev�
 const WHATSAPP_CTA = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero organizar as finanças do meu negócio!")}`;
 const WHATSAPP_OK = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, acabei de preencher o formulário da Nortyx!")}`;
 
-/* ════════════════════════════════════════════════════════════════
-   ⚠️  VALORES EDITÁVEIS — PLANO "APP NORTYX"  ⚠️
-   Edite apenas os valores entre aspas abaixo.
-   ════════════════════════════════════════════════════════════════ */
-const APP_PLAN = {
-  setup: "R$ 1.500",   // ← Setup inicial (pagamento único) — EDITE AQUI
-  mensal: "R$ 250",    // ← Mensalidade — EDITE AQUI
-};
-/* ════════════════════════════════════════════════════════════════ */
-
 const DIAGNOSTICO_URL = "https://nortyxdiagnostico.lovable.app";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -347,7 +355,7 @@ function LandingPage() {
     setContent((c) => ({ ...c, diagCard: { ...c.diagCard, [field]: value } }));
   }
 
-  function updatePlanField(plan: keyof SiteContent["plans"], field: "name" | "tagline", value: string) {
+  function updatePlanField(plan: keyof SiteContent["plans"], field: keyof PlanText, value: string) {
     setContent((c) => ({ ...c, plans: { ...c.plans, [plan]: { ...c.plans[plan], [field]: value } } }));
   }
 
@@ -566,6 +574,20 @@ function LandingPage() {
     );
   }
 
+  function renderEditablePrice(value: string, onChange: (v: string) => void, className?: string) {
+    return (
+      <span
+        className={className}
+        contentEditable={editMode}
+        suppressContentEditableWarning
+        style={editableStyle}
+        onBlur={(e) => onChange(e.currentTarget.textContent || "")}
+      >
+        {value}
+      </span>
+    );
+  }
+
   function renderPlanFeatures(plan: keyof SiteContent["plans"]) {
     const p = content.plans[plan];
     return (
@@ -586,11 +608,6 @@ function LandingPage() {
       </div>
     );
   }
-
-  const plans = {
-    essencial: { m: "R$ 790", a: "R$ 632" },
-    pro: { m: "R$ 1.290", a: "R$ 1.032" },
-  } as const;
 
   return (
     <div>
@@ -815,7 +832,7 @@ function LandingPage() {
             </div>
             <div className="hero-trust">
               <div className="trust-item">
-                <div className="trust-num">{APP_PLAN.mensal}</div>
+                <div className="trust-num">{content.plans.appNortyx.monthly}</div>
                 <div className="trust-text">por mês<br />+ setup inicial</div>
               </div>
               <div style={{ width: 1, height: 36, background: "var(--lp-border)" }} />
@@ -1058,7 +1075,7 @@ function LandingPage() {
             {/* Essencial */}
             <div className="plan rv">
               {renderPlanNameTagline("essencial")}
-              <div className="plan-price">{annual ? plans.essencial.a : plans.essencial.m}</div>
+              <div className="plan-price">{renderEditablePrice(annual ? (content.plans.essencial.annual || "") : (content.plans.essencial.monthly || ""), (v) => updatePlanField("essencial", annual ? "annual" : "monthly", v))}</div>
               <div className="plan-period">{annual ? "/mês · cobrado anualmente" : "/mês · sem fidelidade"}</div>
               {annual && <div className="plan-annual" style={{ display: "block" }}>Equivale a R$ 7.584/ano · economia de R$ 1.896</div>}
               <div className="plan-sep" />
@@ -1070,7 +1087,7 @@ function LandingPage() {
               <button
                 type="button"
                 className="plan-btn plan-btn-out"
-                onClick={() => openModal("Essencial", `${annual ? plans.essencial.a : plans.essencial.m}/mês`)}
+                onClick={() => openModal("Essencial", `${annual ? content.plans.essencial.annual : content.plans.essencial.monthly}/mês`)}
               >
                 Contratar agora
               </button>
@@ -1080,7 +1097,7 @@ function LandingPage() {
             <div className="plan hot rv">
               <div className="plan-badge">MAIS POPULAR</div>
               {renderPlanNameTagline("profissional")}
-              <div className="plan-price">{annual ? plans.pro.a : plans.pro.m}</div>
+              <div className="plan-price">{renderEditablePrice(annual ? (content.plans.profissional.annual || "") : (content.plans.profissional.monthly || ""), (v) => updatePlanField("profissional", annual ? "annual" : "monthly", v))}</div>
               <div className="plan-period">{annual ? "/mês · cobrado anualmente" : "/mês · sem fidelidade"}</div>
               {annual && (
                 <div className="plan-annual" style={{ display: "block", color: "rgba(34,197,94,.8)" }}>
@@ -1092,7 +1109,7 @@ function LandingPage() {
               <button
                 type="button"
                 className="plan-btn plan-btn-fill"
-                onClick={() => openModal("Profissional", `${annual ? plans.pro.a : plans.pro.m}/mês`)}
+                onClick={() => openModal("Profissional", `${annual ? content.plans.profissional.annual : content.plans.profissional.monthly}/mês`)}
               >
                 Contratar agora
               </button>
@@ -1102,14 +1119,14 @@ function LandingPage() {
             <div className="plan app-plan-light rv" id="plano-app">
               <div className="plan-badge app-plan-light-badge">SOMENTE O APP</div>
               {renderPlanNameTagline("appNortyx")}
-              <div className="plan-price">{APP_PLAN.mensal}</div>
-              <div className="plan-period">/mês · + setup inicial de {APP_PLAN.setup}</div>
+              <div className="plan-price">{renderEditablePrice(content.plans.appNortyx.monthly || "", (v) => updatePlanField("appNortyx", "monthly", v))}</div>
+              <div className="plan-period">/mês · + setup inicial de {renderEditablePrice(content.plans.appNortyx.setup || "", (v) => updatePlanField("appNortyx", "setup", v))}</div>
               <div className="plan-sep" />
               {renderPlanFeatures("appNortyx")}
               <button
                 type="button"
                 className="plan-btn plan-btn-out"
-                onClick={() => openModal("App Nortyx", `${APP_PLAN.setup} de setup + ${APP_PLAN.mensal}/mês`)}
+                onClick={() => openModal("App Nortyx", `${content.plans.appNortyx.setup} de setup + ${content.plans.appNortyx.monthly}/mês`)}
               >
                 Adquirir o App →
               </button>
@@ -1118,8 +1135,8 @@ function LandingPage() {
             {/* App Personalizado */}
             <div className="plan app-plan rv">
               {renderPlanNameTagline("appPersonalizado")}
-              <div className="plan-price">Consulta</div>
-              <div className="plan-period">Fale com Estevão para um orçamento</div>
+              <div className="plan-price">{renderEditablePrice(content.plans.appPersonalizado.priceText || "", (v) => updatePlanField("appPersonalizado", "priceText", v))}</div>
+              <div className="plan-period">{renderEditablePrice(content.plans.appPersonalizado.periodText || "", (v) => updatePlanField("appPersonalizado", "periodText", v))}</div>
               <div className="plan-sep" />
               {renderPlanFeatures("appPersonalizado")}
               <a href={WHATSAPP_CUSTOM} target="_blank" rel="noreferrer" className="plan-btn plan-btn-fill app-plan-btn">
@@ -1304,9 +1321,9 @@ function LandingPage() {
             <div>
               <div className="footer-col-title">Planos</div>
               <div className="footer-links">
-                <a href="#planos" onClick={(e) => { e.preventDefault(); openModal("Essencial", `${annual ? plans.essencial.a : plans.essencial.m}/mês`); }}>Essencial</a>
-                <a href="#planos" onClick={(e) => { e.preventDefault(); openModal("Profissional", `${annual ? plans.pro.a : plans.pro.m}/mês`); }}>Profissional</a>
-                <a href="#plano-app" onClick={(e) => { e.preventDefault(); openModal("App Nortyx", `${APP_PLAN.setup} de setup + ${APP_PLAN.mensal}/mês`); }}>App Nortyx</a>
+                <a href="#planos" onClick={(e) => { e.preventDefault(); openModal("Essencial", `${annual ? content.plans.essencial.annual : content.plans.essencial.monthly}/mês`); }}>Essencial</a>
+                <a href="#planos" onClick={(e) => { e.preventDefault(); openModal("Profissional", `${annual ? content.plans.profissional.annual : content.plans.profissional.monthly}/mês`); }}>Profissional</a>
+                <a href="#plano-app" onClick={(e) => { e.preventDefault(); openModal("App Nortyx", `${content.plans.appNortyx.setup} de setup + ${content.plans.appNortyx.monthly}/mês`); }}>App Nortyx</a>
                 <a href={WHATSAPP_CUSTOM} target="_blank" rel="noreferrer">App Personalizado</a>
               </div>
             </div>
