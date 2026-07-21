@@ -298,7 +298,7 @@ function LandingPage() {
     let cancelled = false;
     (async () => {
       const { data, error } = await supabase
-        .from("site_content")
+        .from("nortyx_editable_content")
         .select("content")
         .eq("id", "homepage")
         .maybeSingle();
@@ -379,10 +379,18 @@ function LandingPage() {
   async function saveContent() {
     setSaveStatus("saving");
     const { error } = await supabase
-      .from("site_content")
+      .from("nortyx_editable_content")
       .upsert({ id: "homepage", content, updated_at: new Date().toISOString() });
-    setSaveStatus(error ? "error" : "saved");
-    if (!error) setTimeout(() => setSaveStatus("idle"), 2500);
+    if (error) {
+      console.error("[Nortyx] Falha ao salvar no Supabase:", error);
+      setSaveStatus("error");
+      window.alert(
+        `Não consegui salvar. Detalhe do erro:\n\n${error.message}${error.code ? `\n\nCódigo: ${error.code}` : ""}${error.hint ? `\n\nDica: ${error.hint}` : ""}\n\nSe for a primeira vez, confira se você rodou o setup-supabase.sql no SQL Editor do Supabase.`
+      );
+    } else {
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 2500);
+    }
   }
 
   function tryEnableEditMode() {
