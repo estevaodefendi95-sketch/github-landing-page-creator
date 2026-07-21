@@ -181,7 +181,7 @@ export const Route = createFileRoute("/")({
       { title: "Nortyx — Consultoria Financeira" },
       { name: "description", content: "Fluxo de caixa, DRE, planejamento e controle de inadimplência para profissionais autônomos e pequenas empresas." },
       { property: "og:title", content: "Nortyx — Consultoria Financeira" },
-      { property: "og:description", content: "Organização financeira para quem trabalha por conta própria. Fluxo de caixa, DRE, planejamento e controle de inadimplência." },
+      { property: "og:description", content: "Fluxo de caixa, DRE, planejamento e controle de inadimplência para profissionais autônomos e pequenas empresas." },
       { property: "og:url", content: "/" },
     ],
     links: [{ rel: "canonical", href: "/" }],
