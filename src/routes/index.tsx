@@ -164,7 +164,7 @@ const DEFAULT_CONTENT: SiteContent = {
   footerTagline: "Consultoria financeira para profissionais autônomos e pequenas empresas.",
 };
 
-const WHATSAPP_BASE = "https://wa.me/5516991776593";
+const WHATSAPP_BASE = "https://wa.me/5516991746034";
 const WHATSAPP_HERO = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero uma consultoria financeira!")}`;
 const WHATSAPP_NAV = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, vim pelo site da Nortyx!")}`;
 const WHATSAPP_SEG = `${WHATSAPP_BASE}?text=${encodeURIComponent("Olá Estevão, quero saber se a Nortyx atende meu setor!")}`;
@@ -194,7 +194,7 @@ export const Route = createFileRoute("/")({
           name: "Nortyx",
           description: "Consultoria financeira para profissionais autônomos e pequenas empresas.",
           email: "Nortyx.group@gmail.com",
-          telephone: "+5516991776593",
+          telephone: "+5516991746034",
           founder: { "@type": "Person", name: "Estevão Defendi" },
         }),
       },
@@ -1427,7 +1427,7 @@ function LandingPage() {
               <div className="footer-col-title">Contato</div>
               <div className="footer-contact">
                 <a href="mailto:Nortyx.group@gmail.com">Nortyx.group@gmail.com</a>
-                <a href="tel:+5516991776593">(16) 99177-6593</a>
+                <a href="tel:+5516991746034">(16) 99174-6034</a>
                 <a href={WHATSAPP_BASE} target="_blank" rel="noreferrer" className="footer-wa">💬 WhatsApp direto</a>
               </div>
             </div>
