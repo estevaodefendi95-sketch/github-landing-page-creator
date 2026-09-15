@@ -149,7 +149,7 @@ const DEFAULT_CONTENT: SiteContent = {
     appNortyx: {
       name: "App Nortyx",
       tagline: "O aplicativo de gestão financeira da Nortyx — sem consultoria.",
-      monthly: "R$ 250",
+      monthly: "R$ 390",
       setup: "R$ 1.500",
       features: ["Fluxo de caixa completo", "DRE automático", "Contas a pagar e receber", "Controle de inadimplência e cobranças", "Metas e relatórios gerenciais", "Acesso no celular e no computador (PWA)", "Implantação e treinamento inclusos no setup"],
     },
